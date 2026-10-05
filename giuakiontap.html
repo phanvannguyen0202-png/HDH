@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber-Exam Console - Neon Pro Edition</title>
+  <style>
+    :root {
+      --bg: #05050d;
+      --card-bg: rgba(14, 17, 34, 0.88);
+      --neon-cyan: #00f3ff;
+      --neon-pink: #ff007f;
+      --neon-green: #00ff66;
+      --neon-red: #ff3366;
+      --neon-yellow: #ffe600;
+      --neon-purple: #bd00ff;
+      --text: #f0f6fc;
+      --text-muted: #8b9bb4;
+      --glow-cyan: 0 0 10px rgba(0, 243, 255, 0.4), 0 0 20px rgba(0, 243, 255, 0.2);
+      --glow-pink: 0 0 10px rgba(255, 0, 127, 0.4), 0 0 20px rgba(255, 0, 127, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 243, 255, 0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 50% 120%, rgba(255, 0, 127, 0.12), transparent);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header-card, .quiz-card, .history-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: var(--glow-cyan);
+      backdrop-filter: blur(10px);
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      justify-content: space-between;
+    }
+
+    .select-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    select, input[type="number"], button {
+      background-color: rgba(5, 5, 13, 0.9);
+      color: var(--text);
+      border: 1px solid var(--neon-cyan);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    select:focus, input[type="number"]:focus {
+      border-color: var(--neon-pink);
+      box-shadow: 0 0 8px var(--neon-pink);
+    }
+
+    button {
+      background: transparent;
+      color: var(--neon-cyan);
+      border: 1px solid var(--neon-cyan);
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    button:hover {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: var(--glow-cyan);
+    }
+
+    button.btn-pink {
+      color: var(--neon-pink);
+      border-color: var(--neon-pink);
+    }
+
+    button.btn-pink:hover {
+      background: var(--neon-pink);
+      color: #fff;
+      box-shadow: var(--glow-pink);
+    }
+
+    button.btn-purple {
+      color: var(--neon-purple);
+      border-color: var(--neon-purple);
+    }
+
+    button.btn-purple:hover {
+      background: var(--neon-purple);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(189, 0, 255, 0.5);
+    }
+
+    .toggles-container {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .switch-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--neon-cyan);
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--neon-cyan);
+      transition: .3s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--neon-cyan);
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--neon-cyan);
+    }
+
+    input:checked + .slider {
+      background-color: rgba(255, 0, 127, 0.25);
+      border-color: var(--neon-pink);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+      background-color: var(--neon-pink);
+      box-shadow: 0 0 8px var(--neon-pink);
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      color: var(--neon-yellow);
+      font-size: 14px;
+      margin-top: 14px;
+      border-top: 1px dashed rgba(0, 243, 255, 0.25);
+      padding-top: 12px;
+      font-family: monospace;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .shortcuts-hint {
+      font-size: 12px;
+      color: var(--neon-pink);
+      margin-top: 6px;
+      text-shadow: 0 0 4px rgba(255, 0, 127, 0.4);
+    }
+
+    .question-title {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.6;
+      margin-bottom: 18px;
+      color: #ffffff;
+      border-left: 4px solid var(--neon-pink);
+      padding-left: 12px;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background-color: rgba(5, 5, 13, 0.8);
+      border: 1px solid rgba(0, 243, 255, 0.25);
+      border-radius: 8px;
+      padding: 14px 18px;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 15px;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+      transform: translateX(4px);
+    }
+
+    .opt-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      background-color: rgba(0, 243, 255, 0.1);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .option-btn.selected-correct {
+      background-color: rgba(0, 255, 102, 0.12);
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+    }
+
+    .option-btn.selected-correct .opt-tag {
+      background: var(--neon-green);
+      color: #000;
+      border-color: var(--neon-green);
+    }
+
+    .option-btn.selected-wrong {
+      background-color: rgba(255, 51, 102, 0.12);
+      border-color: var(--neon-red);
+      color: var(--neon-red);
+      box-shadow: 0 0 10px rgba(255, 51, 102, 0.4);
+    }
+
+    .option-btn.selected-wrong .opt-tag {
+      background: var(--neon-red);
+      color: #fff;
+      border-color: var(--neon-red);
+    }
+
+    .option-btn.show-truth {
+      border-color: var(--neon-green);
+      box-shadow: inset 0 0 8px rgba(0, 255, 102, 0.2);
+    }
+
+    .explanation-box {
+      margin-top: 18px;
+      padding: 14px;
+      background: rgba(0, 243, 255, 0.05);
+      border-left: 4px solid var(--neon-cyan);
+      border-radius: 4px;
+      font-size: 14px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .nav-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 22px;
+      gap: 12px;
+    }
+
+    .history-card {
+      border-color: rgba(255, 0, 127, 0.4);
+      box-shadow: var(--glow-pink);
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .history-header h3 {
+      font-size: 16px;
+      color: var(--neon-pink);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .table-wrapper {
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th {
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+    }
+
+    td.score-high {
+      color: var(--neon-green);
+      font-weight: bold;
+    }
+
+    td.score-low {
+      color: var(--neon-red);
+      font-weight: bold;
+    }
+
+    .empty-history {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 16px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-card">
+      <div class="header-title">
+        <span>⚡ Cyber-Exam Console</span>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-review-wrong" class="btn-purple" title="Tập hợp các câu bạn từng làm sai thành 1 đề riêng">Ôn Câu Sai (<span id="wrong-count-badge">0</span>)</button>
+          <button id="btn-finish-exam" class="btn-pink">Nộp Đề & Lưu Lịch Sử</button>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="select-group">
+          <label for="lesson-select">Bộ đề:</label>
+          <select id="lesson-select">
+            <option value="all">Tất cả bài học (Full 268 câu)</option>
+            <option value="1">Đề 1: Giới thiệu HĐH</option>
+            <option value="2">Đề 2: Các dịch vụ HĐH</option>
+            <option value="3">Đề 3: Tiến trình & Luồng</option>
+            <option value="4">Đề 4: Lập lịch CPU</option>
+            <option value="5">Đề 5: Đồng bộ tiến trình</option>
+          </select>
+        </div>
+        <div class="select-group">
+          <label for="random-count">Số câu Random:</label>
+          <input type="number" id="random-count" min="1" max="268" placeholder="VD: 30" style="width: 75px;">
+          <button id="btn-start-random">Random</button>
+          <button id="btn-start-lesson">Làm Đề</button>
+        </div>
+        <div class="toggles-container">
+          <div class="switch-group" title="Xáo trộn thứ tự các câu hỏi">
+            <label class="switch">
+              <input type="checkbox" id="shuffle-questions-toggle">
+              <span class="slider"></span>
+            </label>
+            <span>Đảo câu hỏi</span>
+          </div>
+          <div class="switch-group" title="Xáo trộn vị trí A, B, C, D của từng câu">
+            <label class="switch">
+              <input type="checkbox" id="shuffle-options-toggle">
+              <span class="slider"></span>
+            </label>
+            <span>Đảo đáp án</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats-bar">
+        <span id="stat-exam-name">Đang làm: Tất cả bài học</span>
+        <span id="stat-progress">Câu: 0/0 (Đã làm: 0)</span>
+        <span id="stat-score">Đúng: 0 | Sai: 0 (0%)</span>
+      </div>
+      <div class="shortcuts-hint">
+        Phím tắt: [1 / 2 / 3 / 4] chọn A / B / C / D | [←] Câu trước | [→] Câu tiếp theo
+      </div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question-title" id="q-title">Đang nạp câu hỏi...</div>
+      <div class="options-list" id="opts-container"></div>
+      <div class="explanation-box" id="explain-box"></div>
+      <div class="nav-actions">
+        <button id="btn-prev">← Câu trước</button>
+        <button id="btn-next">Câu tiếp →</button>
+      </div>
+    </div>
+
+    <div class="history-card">
+      <div class="history-header">
+        <h3>📊 Lịch Sử Các Lần Làm Đề</h3>
+        <button id="btn-clear-history" style="font-size: 11px; padding: 4px 8px; border-color: var(--neon-red); color: var(--neon-red);">Xóa Lịch Sử</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>Lần</th>
+              <th>Thời gian</th>
+              <th>Tên Đề</th>
+              <th>Số Câu</th>
+              <th>Đúng / Sai</th>
+              <th>Tỉ Lệ</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody">
+            <tr>
+              <td colspan="6" class="empty-history">Chưa có lịch sử làm đề nào được lưu.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dữ liệu ngân hàng 5 bài
+    const questionBank = [
+      // Bài 1
+      {"id":"b1_1","lesson":1,"question":"Hệ điều hành là gì?","options":["Một thiết bị phần cứng dùng để điều khiển CPU","Một chương trình đóng vai trò trung gian giữa người sử dụng và phần cứng máy tính","Một chương trình chỉ dùng để duyệt web","Một chương trình chỉ dùng để quản lý tệp"],"answer":1,"explain":"Hệ điều hành là chương trình đóng vai trò trung gian giữa người sử dụng máy tính và phần cứng máy tính."},
+      {"id":"b1_2","lesson":1,"question":"Mục tiêu nào sau đây KHÔNG phải là mục tiêu của hệ điều hành?","options":["Thực thi chương trình của người dùng","Làm hệ thống thuận tiện và dễ sử dụng","Sử dụng tài nguyên phần cứng hiệu quả","Thay thế toàn bộ phần cứng máy tính"],"answer":3,"explain":"Bài học nêu ba mục tiêu chính: thực thi chương trình, làm hệ thống thuận tiện và sử dụng tài nguyên hiệu quả."},
+      {"id":"b1_3","lesson":1,"question":"Theo quan điểm Hệ điều hành như một máy mở rộng, hệ điều hành làm gì?","options":["Che giấu các chi tiết phức tạp của phần cứng","Xóa bỏ CPU","Thay thế mọi chương trình ứng dụng","Tăng dung lượng RAM vật lý"],"answer":0,"explain":"Hệ điều hành che giấu các chi tiết phức tạp về cách phần cứng thực sự hoạt động."},
+      {"id":"b1_4","lesson":1,"question":"Time Multiplexing là gì?","options":["Các chương trình dùng những phần khác nhau của tài nguyên cùng lúc","Các chương trình luân phiên sử dụng cùng một tài nguyên ở những thời điểm khác nhau","Các chương trình không được phép chia sẻ tài nguyên","Chỉ chia sẻ bộ nhớ"],"answer":1,"explain":"Time Multiplexing là chia sẻ theo thời gian; ví dụ CPU được chia thành các lát thời gian."},
+      {"id":"b1_5","lesson":1,"question":"Space Multiplexing là gì?","options":["Các chương trình sử dụng những phần khác nhau của cùng tài nguyên tại cùng thời điểm","Các chương trình luân phiên dùng tài nguyên theo thời gian","CPU chỉ chạy một chương trình","Chỉ dùng tài nguyên mạng"],"answer":0,"explain":"Space Multiplexing là chia sẻ theo không gian; ví dụ RAM được chia thành nhiều vùng cho các tiến trình."},
+      {"id":"b1_6","lesson":1,"question":"Thế hệ thứ mấy gắn với Multiprogramming?","options":["Thế hệ thứ nhất","Thế hệ thứ hai","Thế hệ thứ ba","Thế hệ thứ năm"],"answer":2,"explain":"Theo tài liệu, Multiprogramming xuất hiện ở thế hệ thứ ba (1965–1980)."},
+      {"id":"b1_7","lesson":1,"question":"Hệ điều hành nào là ví dụ của thế hệ thứ ba?","options":["OS/360","Android","MS-DOS","iOS"],"answer":0,"explain":"Các hệ điều hành tiêu biểu của thế hệ thứ ba gồm OS/360, MULTICS và UNIX."},
+      {"id":"b1_8","lesson":1,"question":"UNIX phát triển thành hai phiên bản chính nào?","options":["DOS và MS-DOS","System V và BSD","Linux và Android","iOS và Symbian"],"answer":1,"explain":"Tài liệu nêu System V của AT&T và BSD của Đại học California tại Berkeley."},
+      {"id":"b1_9","lesson":1,"question":"Hệ điều hành nào thuộc thế hệ thứ tư?","options":["Linux","Android","iOS","BlackBerry OS"],"answer":0,"explain":"Thế hệ thứ tư (1980–nay) bao gồm các hệ điều hành cho máy tính cá nhân như CP/M, DOS, MS-DOS, MINIX, Linux và Mac OS X."},
+      {"id":"b1_10","lesson":1,"question":"Thế hệ thứ năm gắn với loại hệ điều hành nào?","options":["Hệ điều hành cho máy tính cá nhân","Hệ điều hành cho thiết bị di động","Hệ điều hành xử lý theo lô","Hệ điều hành chỉ dành cho mainframe"],"answer":1,"explain":"Thế hệ thứ năm (1990–nay) tập trung vào hệ điều hành cho thiết bị di động."},
+      {"id":"b1_11","lesson":1,"question":"Một hệ thống máy tính được chia thành bao nhiêu thành phần chính?","options":["2","3","4","5"],"answer":2,"explain":"Bốn thành phần là Hardware, Operating System, Application Programs và Users."},
+      {"id":"b1_12","lesson":1,"question":"Thành phần nào KHÔNG thuộc bốn thành phần chính của hệ thống máy tính?","options":["Hardware","Operating System","Application Programs","Internet"],"answer":3,"explain":"Internet không được liệt kê là một trong bốn thành phần chính."},
+      {"id":"b1_13","lesson":1,"question":"Thành phần nào thuộc Hardware?","options":["CPU","Compiler","Web Browser","Database System"],"answer":0,"explain":"Hardware bao gồm CPU, Memory và các thiết bị I/O."},
+      {"id":"b1_14","lesson":1,"question":"Chương trình nào là Application Program?","options":["CPU","Memory","Compiler","Device Controller"],"answer":2,"explain":"Compiler là một ví dụ về chương trình ứng dụng."},
+      {"id":"b1_15","lesson":1,"question":"Theo tài liệu, Users có thể là ai?","options":["Chỉ con người","Chỉ máy tính","Con người, máy móc hoặc các máy tính khác","Chỉ quản trị viên hệ thống"],"answer":2,"explain":"Users có thể là con người, máy móc hoặc các máy tính khác."},
+      {"id":"b1_16","lesson":1,"question":"Trong hệ thống dùng chung, hệ điều hành cần đảm bảo điều gì?","options":["Chỉ phục vụ người dùng đầu tiên","Tất cả người dùng được phục vụ tốt và công bằng","Tất cả tài nguyên thuộc về một người","Không được chia sẻ tài nguyên"],"answer":1,"explain":"Với hệ thống dùng chung như mainframe, OS phải đảm bảo tất cả người dùng được phục vụ tốt và công bằng."},
+      {"id":"b1_17","lesson":1,"question":"Với vai trò Resource Allocator, hệ điều hành làm gì?","options":["Phân phối CPU, bộ nhớ, I/O và tài nguyên khác","Chỉ quản lý CPU","Chỉ quản lý tệp","Chỉ quản lý người dùng"],"answer":0,"explain":"Resource Allocator phân phối CPU, bộ nhớ, thiết bị vào/ra và các tài nguyên khác."},
+      {"id":"b1_18","lesson":1,"question":"Với vai trò Control Program, hệ điều hành làm gì?","options":["Giám sát thực thi chương trình và quản lý hoạt động phần cứng","Chỉ tạo tài liệu","Chỉ cung cấp trò chơi","Thay thế tất cả ứng dụng"],"answer":0,"explain":"Control Program giám sát việc thực thi chương trình, quản lý phần cứng và đảm bảo hệ thống vận hành an toàn, hiệu quả."},
+      {"id":"b1_19","lesson":1,"question":"Kernel là gì?","options":["Một thiết bị phần cứng","Chương trình luôn chạy trên máy tính","Một trình duyệt web","Một cơ sở dữ liệu"],"answer":1,"explain":"Tài liệu mô tả chương trình luôn chạy trên máy tính là kernel, một phần của hệ điều hành."},
+      {"id":"b1_20","lesson":1,"question":"System Program là gì?","options":["Chương trình luôn thuộc kernel","Chương trình được cung cấp cùng OS nhưng không thuộc kernel","Một thiết bị phần cứng","Một loại người dùng"],"answer":1,"explain":"System Program được cung cấp cùng OS nhưng không thuộc kernel."},
+      {"id":"b1_21","lesson":1,"question":"Middleware cung cấp gì?","options":["Các dịch vụ bổ sung cho nhà phát triển ứng dụng","Chỉ CPU scheduling","Chỉ bảo vệ phần cứng","Chỉ lưu trữ tệp"],"answer":0,"explain":"Middleware là tập hợp framework phần mềm cung cấp các dịch vụ bổ sung như cơ sở dữ liệu, đa phương tiện và đồ họa."},
+      {"id":"b1_22","lesson":1,"question":"Mỗi Device Controller chịu trách nhiệm gì?","options":["Quản lý một loại thiết bị cụ thể","Quản lý tất cả người dùng","Quản lý mọi ứng dụng","Chỉ quản lý CPU"],"answer":0,"explain":"Mỗi bộ điều khiển thiết bị quản lý một loại thiết bị cụ thể."},
+      {"id":"b1_23","lesson":1,"question":"Mỗi Device Controller có gì?","options":["Local Buffer","Compiler","Web Browser","Virtual Machine"],"answer":0,"explain":"Mỗi Device Controller có một bộ đệm cục bộ (Local Buffer)."},
+      {"id":"b1_24","lesson":1,"question":"Phần mềm nào của hệ điều hành quản lý Device Controller?","options":["Device Driver","Compiler","Web Browser","Database"],"answer":0,"explain":"Mỗi loại Device Controller có một Device Driver của hệ điều hành để quản lý."},
+      {"id":"b1_25","lesson":1,"question":"Device Controller báo cho CPU biết I/O hoàn tất bằng cách nào?","options":["Tắt máy","Phát sinh Interrupt","Xóa dữ liệu","Khởi động lại CPU"],"answer":1,"explain":"Bộ điều khiển thiết bị thông báo hoàn thành thao tác bằng cách phát sinh một Interrupt."},
+      {"id":"b1_26","lesson":1,"question":"Interrupt chuyển quyền điều khiển đến đâu?","options":["Application Program","Interrupt Service Routine","Web Browser","Database"],"answer":1,"explain":"Interrupt chuyển quyền điều khiển đến Interrupt Service Routine (ISR)."},
+      {"id":"b1_27","lesson":1,"question":"ISR là viết tắt của gì?","options":["Internal System Resource","Interrupt Service Routine","Input System Register","Internal Storage Request"],"answer":1,"explain":"ISR = Interrupt Service Routine."},
+      {"id":"b1_28","lesson":1,"question":"Trap hoặc Exception là gì?","options":["Interrupt do phần mềm tạo ra","Một loại ổ đĩa","Một thiết bị bộ nhớ","Một giao thức mạng"],"answer":0,"explain":"Trap/Exception là interrupt do phần mềm tạo ra, do lỗi hoặc yêu cầu từ người dùng."},
+      {"id":"b1_29","lesson":1,"question":"Khi xử lý interrupt, hệ điều hành bảo toàn trạng thái CPU bằng cách lưu gì?","options":["Registers và Program Counter","Chỉ ổ đĩa","Chỉ keyboard buffer","Toàn bộ hard disk"],"answer":0,"explain":"OS lưu nội dung các thanh ghi (Registers) và Program Counter."},
+      {"id":"b1_30","lesson":1,"question":"Main Memory có đặc điểm nào?","options":["CPU có thể truy cập trực tiếp","CPU không thể truy cập","Luôn nonvolatile","Luôn chậm hơn secondary storage"],"answer":0,"explain":"Main Memory là thiết bị lưu trữ dung lượng lớn duy nhất mà CPU có thể truy cập trực tiếp."},
+      {"id":"b1_31","lesson":1,"question":"Main Memory thường có tính chất gì?","options":["Volatile","Nonvolatile","Permanent","Optical"],"answer":0,"explain":"Main Memory thường là bộ nhớ khả biến (Volatile)."},
+      {"id":"b1_32","lesson":1,"question":"Công nghệ nào được nêu là công nghệ của Main Memory?","options":["DRAM","HDD","SSD","DVD"],"answer":0,"explain":"Tài liệu nêu Main Memory thông thường là DRAM."},
+      {"id":"b1_33","lesson":1,"question":"Secondary Storage có đặc điểm nào?","options":["Volatile","Nonvolatile","Chỉ là CPU cache","Nhỏ hơn register"],"answer":1,"explain":"Secondary Storage cung cấp dung lượng lớn và không mất dữ liệu khi mất điện."},
+      {"id":"b1_34","lesson":1,"question":"Bề mặt đĩa cứng được chia logic thành gì?","options":["Tracks và Sectors","Processes và Threads","Pages và Frames","Users và Groups"],"answer":0,"explain":"Bề mặt đĩa được chia thành Tracks, mỗi Track lại chia thành Sectors."},
+      {"id":"b1_35","lesson":1,"question":"SSD thuộc công nghệ nào?","options":["Non-Volatile Memory","Vacuum Tubes","Magnetic Tape","CPU Registers"],"answer":0,"explain":"SSD là một ví dụ của thiết bị dùng Non-Volatile Memory."},
+      {"id":"b1_36","lesson":1,"question":"Memory Hierarchy dựa trên những yếu tố nào?","options":["Speed, Cost, Volatility","Size, Color, Brand","Users, Files, Programs","CPU, Keyboard, Mouse"],"answer":0,"explain":"Phân cấp bộ nhớ dựa trên Speed, Cost và Volatility."},
+      {"id":"b1_37","lesson":1,"question":"Caching là gì?","options":["Sao chép dữ liệu vào hệ thống lưu trữ nhanh hơn","Xóa dữ liệu vĩnh viễn","Mã hóa tất cả tệp","Đưa mọi chương trình lên cloud"],"answer":0,"explain":"Caching là quá trình sao chép dữ liệu vào một hệ thống lưu trữ có tốc độ cao hơn."},
+      {"id":"b1_38","lesson":1,"question":"Mục đích chính của Multiprogramming là gì?","options":["Giữ CPU luôn có một công việc sẵn sàng thực thi","Chỉ cho một chương trình chạy","Vô hiệu hóa I/O","Giảm số lượng người dùng"],"answer":0,"explain":"Multiprogramming tổ chức các jobs để CPU luôn có một job sẵn sàng thực thi."},
+      {"id":"b1_39","lesson":1,"question":"Khi một job phải chờ I/O, hệ điều hành thường làm gì?","options":["Dừng toàn bộ máy tính","Chuyển sang thực thi một job khác","Xóa job","Tắt CPU"],"answer":1,"explain":"Khi job chờ I/O, OS chuyển sang thực thi một công việc khác."},
+      {"id":"b1_40","lesson":1,"question":"Timesharing cho phép điều gì?","options":["Người dùng tương tác với chương trình trong khi chương trình đang thực thi","Chỉ một chương trình chạy mãi","Không có tương tác người dùng","Chỉ xử lý theo lô"],"answer":0,"explain":"Timesharing chuyển đổi CPU giữa các công việc với tần suất cao, tạo môi trường tính toán tương tác."},
+      {"id":"b1_41","lesson":1,"question":"Mục đích của Dual-Mode Operation là gì?","options":["Bảo vệ hệ điều hành và các thành phần khác của hệ thống","Tăng dung lượng ổ cứng","Thay thế RAM","Loại bỏ interrupt"],"answer":0,"explain":"Dual-Mode Operation giúp OS bảo vệ chính nó và các thành phần khác của hệ thống."},
+      {"id":"b1_42","lesson":1,"question":"Dual-Mode Operation gồm hai chế độ nào?","options":["User Mode và Kernel Mode","CPU Mode và RAM Mode","File Mode và Network Mode","Client Mode và Server Mode"],"answer":0,"explain":"Hai chế độ là User Mode và Kernel Mode."},
+      {"id":"b1_43","lesson":1,"question":"Mode Bit dùng để làm gì?","options":["Phân biệt mã user và mã kernel đang được thực thi","Tăng dung lượng bộ nhớ","Xác định loại ổ cứng","Đăng nhập người dùng"],"answer":0,"explain":"Mode Bit cho phép phân biệt hệ thống đang chạy mã của user hay kernel."},
+      {"id":"b1_44","lesson":1,"question":"System Call chuyển hệ thống sang chế độ nào?","options":["User","Kernel","Storage","Network"],"answer":1,"explain":"System Call chuyển chế độ sang Kernel; khi kết thúc, hệ thống trở lại User."},
+      {"id":"b1_45","lesson":1,"question":"Privileged Instructions chỉ được thực thi ở đâu?","options":["User Mode","Kernel Mode","Application Mode","Network Mode"],"answer":1,"explain":"Một số lệnh đặc quyền chỉ được phép thực thi trong Kernel Mode."},
+      {"id":"b1_46","lesson":1,"question":"Protection là gì?","options":["Cơ chế kiểm soát quyền truy cập của process/user vào tài nguyên","Bảo vệ hệ thống trước mọi cuộc tấn công từ Internet","Một loại bộ nhớ","Một loại mạng"],"answer":0,"explain":"Protection kiểm soát quyền truy cập của process hoặc user đối với tài nguyên do OS quản lý."},
+      {"id":"b1_47","lesson":1,"question":"Security là gì?","options":["Bảo vệ hệ thống trước các cuộc tấn công từ bên trong và bên ngoài","Chỉ phân chia CPU","Chỉ quản lý bộ nhớ","Chỉ kiểm soát máy in"],"answer":0,"explain":"Security là việc bảo vệ hệ thống trước các cuộc tấn công từ bên trong và bên ngoài."},
+      {"id":"b1_48","lesson":1,"question":"P2P khác Client–Server ở điểm nào?","options":["P2P không phân biệt Client và Server","P2P chỉ có Server","P2P không có mạng","P2P chỉ có một node"],"answer":0,"explain":"Trong P2P, các node là peers và mỗi node có thể là client, server hoặc cả hai."},
+      {"id":"b1_49","lesson":1,"question":"Cloud Computing cung cấp những gì thông qua mạng?","options":["Dịch vụ tính toán, lưu trữ và thậm chí ứng dụng","Chỉ CPU vật lý","Chỉ bàn phím và chuột","Chỉ hệ điều hành"],"answer":0,"explain":"Cloud Computing cung cấp dịch vụ tính toán, lưu trữ và ứng dụng thông qua mạng."},
+      {"id":"b1_50","lesson":1,"question":"Ba loại Cloud cơ bản là gì?","options":["Public, Private, Hybrid","LAN, WAN, MAN","SaaS, PaaS, LAN","CPU, RAM, SSD"],"answer":0,"explain":"Ba loại được nêu là Public Cloud, Private Cloud và Hybrid Cloud."},
+      {"id":"b1_51","lesson":1,"question":"SaaS là gì?","options":["Software as a Service","Storage as a System","System as a Service","Software as a Storage"],"answer":0,"explain":"SaaS = Software as a Service, cung cấp một hoặc nhiều ứng dụng qua Internet."},
+      {"id":"b1_52","lesson":1,"question":"PaaS là gì?","options":["Platform as a Service","Program as a System","Private as a Service","Platform as a Storage"],"answer":0,"explain":"PaaS cung cấp một software stack sẵn sàng để phát triển và triển khai ứng dụng."},
+      {"id":"b1_53","lesson":1,"question":"IaaS là gì?","options":["Infrastructure as a Service","Internet as a System","Input as a Service","Internal as a Storage"],"answer":0,"explain":"IaaS cung cấp máy chủ hoặc không gian lưu trữ qua Internet."},
+      {"id":"b1_54","lesson":1,"question":"Embedded Systems thường chạy loại hệ điều hành nào?","options":["Real-Time Operating Systems","Batch Operating Systems","Desktop Operating Systems","Mobile-only Operating Systems"],"answer":0,"explain":"Tài liệu nêu các hệ thống nhúng hầu như luôn chạy RTOS."},
+      {"id":"b1_55","lesson":1,"question":"Hệ điều hành Open Source được cung cấp dưới dạng nào?","options":["Source Code","Chỉ Binary","Chỉ mã độc quyền","Chỉ firmware"],"answer":0,"explain":"Open-source operating systems được cung cấp dưới dạng mã nguồn thay vì chỉ dạng mã nhị phân đóng và độc quyền."},
+
+      // Bài 2
+      {"id":"b2_1","lesson":2,"question":"Dịch vụ nào cho phép người dùng tương tác với hệ điều hành bằng lệnh trực tiếp?","options":["GUI","CLI","Batch only","ABI"],"answer":1,"explain":"CLI (Command-Line Interface) cho phép nhập lệnh trực tiếp."},
+      {"id":"b2_2","lesson":2,"question":"Giao diện GUI thường sử dụng thành phần nào?","options":["Chuột, bàn phím và màn hình","Chỉ cảm biến nhiệt độ","Chỉ CPU và RAM","Chỉ dòng lệnh"],"answer":0,"explain":"Slide mô tả GUI thường sử dụng chuột, bàn phím và màn hình."},
+      {"id":"b2_3","lesson":2,"question":"Theo bài học, GUI được phát minh tại đâu?","options":["IBM","Xerox PARC","Bell Labs","MIT"],"answer":1,"explain":"Bài học nêu GUI được phát minh tại Xerox PARC."},
+      {"id":"b2_4","lesson":2,"question":"Microsoft Windows được mô tả là gì trong slide về GUI?","options":["GUI với shell dòng lệnh command","Chỉ CLI","Hệ điều hành không có shell","Microkernel thuần túy"],"answer":0,"explain":"Slide nêu Microsoft Windows là GUI với shell dòng lệnh “command”."},
+      {"id":"b2_5","lesson":2,"question":"Apple Mac OS X có giao diện GUI nào theo bài?","options":["Aqua","GNOME","KDE","CDE"],"answer":0,"explain":"Bài học nêu Mac OS X có GUI “Aqua”."},
+      {"id":"b2_6","lesson":2,"question":"Thao tác dựa trên cử chỉ, bàn phím ảo và lệnh thoại là đặc trưng của giao diện nào?","options":["Touchscreen","CLI","Batch","ABI"],"answer":0,"explain":"Đây là các đặc trưng được nêu cho touchscreen interfaces."},
+      {"id":"b2_7","lesson":2,"question":"Dịch vụ nào yêu cầu hệ thống nạp chương trình vào bộ nhớ và chạy chương trình?","options":["Program execution","Logging","File-system manipulation","Protection"],"answer":0,"explain":"Program execution bao gồm nạp và thực thi chương trình, kết thúc bình thường hoặc bất thường."},
+      {"id":"b2_8","lesson":2,"question":"Dịch vụ file-system manipulation bao gồm việc nào?","options":["Tạo, xóa, tìm kiếm và quản lý quyền file/thư mục","Chỉ thay CPU","Chỉ cấp RAM","Chỉ lập lịch CPU"],"answer":0,"explain":"Bài học liệt kê tạo, xóa, tìm kiếm, liệt kê và quản lý quyền file/thư mục."},
+      {"id":"b2_9","lesson":2,"question":"Dịch vụ Communications cho phép các tiến trình làm gì?","options":["Trao đổi thông tin cùng máy hoặc qua mạng","Chỉ thay đổi tốc độ CPU","Chỉ xóa file hệ thống","Chỉ quản lý RAM"],"answer":0,"explain":"Communications hỗ trợ trao đổi thông tin trên cùng máy tính hoặc giữa các máy qua mạng."},
+      {"id":"b2_10","lesson":2,"question":"Error detection tập trung vào điều gì?","options":["Nhận biết các lỗi có thể xảy ra trong phần cứng, I/O và chương trình","Tăng kích thước màn hình","Chọn hình nền","Tạo tài khoản email"],"answer":0,"explain":"OS cần phát hiện lỗi từ CPU, bộ nhớ, thiết bị I/O hoặc chương trình người dùng."},
+      {"id":"b2_11","lesson":2,"question":"Resource allocation là dịch vụ nhằm làm gì?","options":["Phân bổ tài nguyên cho người dùng hoặc công việc","Tạo giao diện Aqua","Biên dịch Java","Thiết kế icon"],"answer":0,"explain":"Resource allocation phân bổ chu kỳ CPU, bộ nhớ, lưu trữ và I/O."},
+      {"id":"b2_12","lesson":2,"question":"Logging trong OS service được mô tả là gì?","options":["Theo dõi người dùng, chương trình và tài nguyên","Nén toàn bộ RAM","Thay thế file hệ thống","Tạo process mới"],"answer":0,"explain":"Logging là theo dõi người dùng, chương trình và tài nguyên."},
+      {"id":"b2_13","lesson":2,"question":"Protection đảm bảo điều gì?","options":["Mọi quyền truy cập tài nguyên hệ thống đều được kiểm soát","Mọi chương trình đều có toàn quyền","Mọi file đều công khai","CPU luôn chạy 100%"],"answer":0,"explain":"Protection đảm bảo truy cập tài nguyên hệ thống được kiểm soát."},
+      {"id":"b2_14","lesson":2,"question":"Security của hệ thống yêu cầu điều gì theo bài?","options":["Xác thực và bảo vệ thiết bị I/O khỏi truy cập không hợp lệ","Chỉ đổi mật khẩu Wi-Fi","Chỉ tăng RAM","Chỉ chạy GUI"],"answer":0,"explain":"Bài học nêu security yêu cầu authentication và bảo vệ I/O khỏi truy cập không hợp lệ."},
+      {"id":"b2_15","lesson":2,"question":"System call là gì?","options":["Giao diện lập trình cho các dịch vụ do OS cung cấp","Một thiết bị I/O","Một loại CPU","Một tệp ảnh"],"answer":0,"explain":"System call là giao diện lập trình cho các dịch vụ của hệ điều hành."},
+      {"id":"b2_16","lesson":2,"question":"System call thường được viết bằng ngôn ngữ nào theo bài?","options":["C hoặc C++","HTML hoặc CSS","SQL hoặc XML","Bash hoặc PowerShell בלבד"],"answer":0,"explain":"Bài học nêu system call thường được viết bằng C hoặc C++."},
+      {"id":"b2_17","lesson":2,"question":"API nào là một trong ba API phổ biến nhất được nêu?","options":["POSIX API","SMTP API","HTML API","GPU API"],"answer":0,"explain":"Ba API được nêu là Win32, POSIX và Java API."},
+      {"id":"b2_18","lesson":2,"question":"API nào dành cho các hệ thống dựa trên POSIX?","options":["POSIX API","Win32 API","Java API","Aqua API"],"answer":0,"explain":"POSIX API dùng cho các hệ thống dựa trên POSIX, gồm UNIX, Linux và Mac OS X."},
+      {"id":"b2_19","lesson":2,"question":"Windows sử dụng API nào được nêu trong bài?","options":["Win32 API","POSIX API","Darwin API","BCC API"],"answer":0,"explain":"Win32 API là API phổ biến dành cho Windows."},
+      {"id":"b2_20","lesson":2,"question":"Java API trong bài gắn với môi trường nào?","options":["Java Virtual Machine (JVM)","Linux Kernel","Xerox PARC","BIOS"],"answer":0,"explain":"Java API dành cho Java Virtual Machine (JVM)."},
+      {"id":"b2_21","lesson":2,"question":"Một lời gọi hệ thống thông thường được gắn với gì?","options":["Một con số","Một địa chỉ MAC","Một màu giao diện","Một tệp PDF"],"answer":0,"explain":"Mỗi system call thường được gắn với một con số để system-call interface lập bảng tra cứu."},
+      {"id":"b2_22","lesson":2,"question":"System-call interface sử dụng bảng được lập chỉ mục theo gì?","options":["Số của system call","Tên người dùng","Địa chỉ IP","Kích thước RAM"],"answer":0,"explain":"Bảng system-call interface được lập chỉ mục theo số system call."},
+      {"id":"b2_23","lesson":2,"question":"Chương trình gọi system call có cần biết cách system call được triển khai bên trong không?","options":["Không","Có, luôn phải biết chi tiết kernel","Chỉ khi dùng GUI","Chỉ khi dùng Java"],"answer":0,"explain":"Chương trình gọi chỉ cần tuân theo API và biết OS sẽ làm gì sau lời gọi."},
+      {"id":"b2_24","lesson":2,"question":"Phương pháp truyền tham số đơn giản nhất cho system call là gì?","options":["Đặt tham số trong các thanh ghi","Lưu vào màn hình","Ghi vào bàn phím","Gửi qua DNS"],"answer":0,"explain":"Slide nêu phương pháp đơn giản nhất là truyền tham số trong các thanh ghi."},
+      {"id":"b2_25","lesson":2,"question":"Theo bài, Linux và Solaris sử dụng phương pháp truyền tham số nào?","options":["Lưu tham số trong block/table ở bộ nhớ rồi truyền địa chỉ","Chỉ dùng stack","Chỉ dùng file","Chỉ dùng GUI"],"answer":0,"explain":"Bài học nêu Linux và Solaris sử dụng block/table trong bộ nhớ và truyền địa chỉ block."},
+      {"id":"b2_26","lesson":2,"question":"Phương pháp push tham số vào stack có ưu điểm gì?","options":["Không giới hạn số lượng hoặc độ dài tham số truyền","Không cần kernel","Không cần CPU","Chỉ dùng cho GUI"],"answer":0,"explain":"Bài học nêu block và stack không giới hạn số lượng hoặc độ dài tham số truyền."},
+      {"id":"b2_27","lesson":2,"question":"Nhóm system call nào bao gồm create process và terminate process?","options":["Process control","File management","Protection","Information maintenance"],"answer":0,"explain":"Create/terminate process thuộc nhóm Process control."},
+      {"id":"b2_28","lesson":2,"question":"Nhóm system call nào bao gồm create file và delete file?","options":["File management","Communications","Protection","Process control"],"answer":0,"explain":"Create/delete/open/close/read/write file thuộc File management."},
+      {"id":"b2_29","lesson":2,"question":"request device và release device thuộc nhóm system call nào?","options":["Device management","File management","Protection","Information maintenance"],"answer":0,"explain":"request/release/read/write device thuộc Device management."},
+      {"id":"b2_30","lesson":2,"question":"get time or date và set time or date thuộc nhóm nào?","options":["Information maintenance","Communications","Process control","Protection"],"answer":0,"explain":"Đây là các thao tác trong Information maintenance."},
+      {"id":"b2_31","lesson":2,"question":"send và receive messages là ví dụ của nhóm system call nào?","options":["Communications","File management","Process control","Device management"],"answer":0,"explain":"send/receive messages thuộc Communications."},
+      {"id":"b2_32","lesson":2,"question":"Get and set permissions thuộc nhóm system call nào?","options":["Protection","Communications","File management","Process control"],"answer":0,"explain":"Control access, get/set permissions và allow/deny access thuộc Protection."},
+      {"id":"b2_33","lesson":2,"question":"printf() trong ví dụ thư viện C gọi system call nào?","options":["write()","fork()","exec()","wait()"],"answer":0,"explain":"Slide ví dụ: chương trình C gọi printf(), rồi gọi system call write()."},
+      {"id":"b2_34","lesson":2,"question":"Trong ví dụ FreeBSD, fork() dùng để làm gì?","options":["Tạo tiến trình","Thay thế không gian nhớ bằng chương trình mới","Chờ con kết thúc","Đọc file"],"answer":0,"explain":"fork() tạo một tiến trình mới."},
+      {"id":"b2_35","lesson":2,"question":"Trong ví dụ FreeBSD, exec() dùng để làm gì?","options":["Nạp chương trình vào tiến trình","Tạo shell","Ghi log","Đóng thiết bị"],"answer":0,"explain":"exec() được dùng để nạp chương trình vào tiến trình sau fork()."},
+      {"id":"b2_36","lesson":2,"question":"Trong ví dụ FreeBSD, code = 0 khi tiến trình kết thúc biểu thị gì?","options":["Không có lỗi","Có lỗi nghiêm trọng","Thiếu bộ nhớ","Không tìm thấy shell"],"answer":0,"explain":"Slide nêu code = 0 – không có lỗi; code > 0 – mã lỗi."},
+      {"id":"b2_37","lesson":2,"question":"Các chương trình hệ thống (system programs) chủ yếu cung cấp gì?","options":["Môi trường thuận tiện cho phát triển và thực thi chương trình","Chỉ phần cứng","Chỉ BIOS","Chỉ bộ nhớ cache"],"answer":0,"explain":"System programs cung cấp môi trường thuận tiện cho phát triển và thực thi chương trình."},
+      {"id":"b2_38","lesson":2,"question":"Chương trình hệ thống nào quản lý tạo, xóa, sao chép, đổi tên và liệt kê file?","options":["File management","Status information","Communications","Background services"],"answer":0,"explain":"Đây là chức năng File management."},
+      {"id":"b2_39","lesson":2,"question":"Một số hệ thống triển khai registry để làm gì?","options":["Lưu trữ và truy xuất thông tin cấu hình","Lập lịch CPU","Tạo mutex","Quản lý socket"],"answer":0,"explain":"Registry được nêu là nơi lưu trữ và truy xuất thông tin cấu hình."},
+      {"id":"b2_40","lesson":2,"question":"Background services thường được khởi chạy khi nào?","options":["Khi hệ thống khởi động","Chỉ khi người dùng tắt máy","Chỉ khi biên dịch","Chỉ khi mở trình duyệt"],"answer":0,"explain":"Background services khởi chạy tại thời điểm boot."},
+      {"id":"b2_41","lesson":2,"question":"Background service có thể được gọi là gì?","options":["Daemon","CPU burst","PCB","ABI"],"answer":0,"explain":"Bài học nêu services, subsystems hoặc daemons."},
+      {"id":"b2_42","lesson":2,"question":"Theo bài, application programs thường được xem như thế nào?","options":["Không thuộc hệ điều hành","Luôn thuộc kernel","Là phần cứng","Là system call"],"answer":0,"explain":"Application programs do người dùng chạy và thường không được xem là một phần của OS."},
+      {"id":"b2_43","lesson":2,"question":"Linker có nhiệm vụ chính gì?","options":["Kết hợp object files thành một binary executable và đưa các thư viện vào","Nạp process vào CPU","Quản lý ready queue","Phát hiện race condition"],"answer":0,"explain":"Linker kết hợp các object files thành executable và đưa thư viện vào."},
+      {"id":"b2_44","lesson":2,"question":"Loader có nhiệm vụ chính gì?","options":["Đưa executable từ bộ nhớ thứ cấp vào bộ nhớ để thực thi","Kết hợp object files","Tạo GUI","Cấp quyền file"],"answer":0,"explain":"Chương trình phải được Loader đưa vào bộ nhớ để thực thi."},
+      {"id":"b2_45","lesson":2,"question":"Relocation là gì?","options":["Gán địa chỉ cuối cùng cho các thành phần và điều chỉnh mã/dữ liệu theo địa chỉ","Tạo process con","Đổi shell","Lập lịch thread"],"answer":0,"explain":"Relocation gán địa chỉ cuối cùng và điều chỉnh mã lệnh/dữ liệu phù hợp."},
+      {"id":"b2_46","lesson":2,"question":"Dynamically linked libraries có đặc điểm nào?","options":["Được nạp khi cần và có thể chia sẻ giữa các chương trình dùng cùng phiên bản","Luôn nhúng nguyên bản vào mọi executable","Chỉ dùng cho BIOS","Không thể chia sẻ"],"answer":0,"explain":"DLL và các thư viện liên kết động được nạp khi cần và có thể chia sẻ."},
+      {"id":"b2_47","lesson":2,"question":"ABI là gì theo bài?","options":["Giao diện nhị phân xác định cách các thành phần mã nhị phân giao tiếp trên OS/kiến trúc cụ thể","Một shell","Một semaphore","Một driver"],"answer":0,"explain":"ABI là tương đương cấp kiến trúc của API, quy định giao tiếp giữa các thành phần mã nhị phân."},
+      {"id":"b2_48","lesson":2,"question":"Trong cấu trúc layered, lớp 0 thường là gì?","options":["Phần cứng","Giao diện người dùng","Application programs","Shell"],"answer":0,"explain":"Lớp dưới cùng (0) là phần cứng; lớp cao nhất là giao diện người dùng."},
+      {"id":"b2_49","lesson":2,"question":"Trong microkernel, xu hướng là chuyển nhiều thành phần ra đâu?","options":["Không gian người dùng","ROM","GPU","BIOS"],"answer":0,"explain":"Microkernel chuyển càng nhiều thành phần càng tốt từ kernel sang user space."},
+      {"id":"b2_50","lesson":2,"question":"Mach là ví dụ của cấu trúc nào?","options":["Microkernel","FCFS","Round Robin","Named Pipe"],"answer":0,"explain":"Bài học nêu Mach là ví dụ microkernel."},
+      {"id":"b2_51","lesson":2,"question":"Một lợi ích của microkernel là gì?","options":["Dễ mở rộng và đáng tin cậy hơn do ít mã chạy ở kernel mode","Luôn nhanh hơn mọi cấu trúc","Không cần giao tiếp giữa user và kernel","Không cần bảo mật"],"answer":0,"explain":"Microkernel dễ mở rộng/chuyển kiến trúc, đáng tin cậy và an toàn hơn theo slide; đổi lại có chi phí giao tiếp."},
+      {"id":"b2_52","lesson":2,"question":"Hạn chế của microkernel được nêu là gì?","options":["Chi phí hiệu năng do giao tiếp giữa user space và kernel space","Không thể mở rộng","Không thể chạy trên máy mới","Không hỗ trợ message passing"],"answer":0,"explain":"Chi phí hiệu năng do giao tiếp user/kernel là hạn chế của microkernel."},
+      {"id":"b2_53","lesson":2,"question":"Loadable Kernel Modules (LKMs) có đặc điểm nào?","options":["Có thể nạp từng thành phần cần thiết vào kernel khi cần","Chỉ chạy ở user space","Không có giao diện giữa các thành phần","Chỉ dùng trên DOS"],"answer":0,"explain":"LKMs cho phép mỗi thành phần được nạp vào kernel khi cần."},
+      {"id":"b2_54","lesson":2,"question":"Linux và Solaris trong bài được mô tả là gì?","options":["Monolithic kết hợp modular","Microkernel thuần túy","Layered thuần túy","Không có kernel"],"answer":0,"explain":"Kernel Linux/Solaris nằm trong kernel address space nên mang tính monolithic và có modular loading."},
+      {"id":"b2_55","lesson":2,"question":"Mô hình hybrid là gì?","options":["Kết hợp nhiều phương pháp cấu trúc để đáp ứng hiệu năng, bảo mật và khả năng sử dụng","Chỉ dùng microkernel","Chỉ dùng layered","Không có module"],"answer":0,"explain":"Hybrid kết hợp nhiều phương pháp để đáp ứng các yêu cầu hệ thống."},
+      {"id":"b2_56","lesson":2,"question":"Darwin là gì theo slide?","options":["Tập hợp các thành phần mã nguồn mở của kernel mà Apple sử dụng cho OS X và iOS","Một API của Windows","Một shell Linux","Một compiler"],"answer":0,"explain":"Slide định nghĩa Darwin là tập hợp các thành phần kernel mã nguồn mở Apple dùng cho OS X và iOS."},
+      {"id":"b2_57","lesson":2,"question":"Android trong bài được mô tả dựa trên kernel nào?","options":["Linux","Mach","Windows NT","BSD kernel thuần túy"],"answer":0,"explain":"Android dựa trên Linux kernel nhưng đã được sửa đổi."},
+      {"id":"b2_58","lesson":2,"question":"Môi trường runtime của Android trong slide bao gồm máy ảo nào?","options":["Dalvik","JVM בלבד","Mach VM","CLR"],"answer":0,"explain":"Slide nêu runtime gồm các thư viện lõi và máy ảo Dalvik."},
+      {"id":"b2_59","lesson":2,"question":"BCC/BPF tracing tools được dùng để làm gì?","options":["Theo dõi hoạt động của Linux, như hoạt động I/O của đĩa","Tạo GUI","Lập lịch FCFS","Quản lý file permissions"],"answer":0,"explain":"BCC cung cấp các công cụ tracing cho Linux; ví dụ disksnoop.py theo dõi I/O đĩa."},
+
+      // Bài 3
+      {"id":"b3_1","lesson":3,"question":"Process là gì?","options":["Một chương trình đang được thực thi","Một file executable thụ động","Một thiết bị I/O","Một bộ lập lịch"],"answer":0,"explain":"Bài học định nghĩa Process là chương trình đang được thực thi."},
+      {"id":"b3_2","lesson":3,"question":"Program được mô tả là thực thể nào?","options":["Thụ động (Passive)","Chủ động (Active)","Luôn ở CPU","Luôn ở kernel"],"answer":0,"explain":"Program là thực thể thụ động lưu trên đĩa; Process là thực thể chủ động."},
+      {"id":"b3_3","lesson":3,"question":"Process được thực hiện như thế nào trong cùng một tiến trình?","options":["Theo trình tự tuần tự","Luôn song song giữa các lệnh","Luôn qua mạng","Chỉ bởi GPU"],"answer":0,"explain":"Việc thực thi một process phải diễn ra theo trình tự tuần tự."},
+      {"id":"b3_4","lesson":3,"question":"Thành phần nào là vùng mã của process?","options":["Text Section / Program Code","Heap","Stack","Data Section"],"answer":0,"explain":"Program Code còn gọi là Text Section."},
+      {"id":"b3_5","lesson":3,"question":"Program Counter của process thuộc phần nào?","options":["Current Activity","File system","Heap","I/O device"],"answer":0,"explain":"Current Activity bao gồm Program Counter và Processor Registers."},
+      {"id":"b3_6","lesson":3,"question":"Stack của process chứa gì?","options":["Tham số hàm, địa chỉ trả về và biến cục bộ","Chỉ biến toàn cục","Chỉ file mở","Chỉ mã máy"],"answer":0,"explain":"Stack được nêu là chứa function parameters, return addresses và local variables."},
+      {"id":"b3_7","lesson":3,"question":"Data Section chứa chủ yếu gì?","options":["Global Variables","CPU registers","Return addresses","I/O queues"],"answer":0,"explain":"Data Section chứa các biến toàn cục."},
+      {"id":"b3_8","lesson":3,"question":"Heap chứa gì?","options":["Bộ nhớ được cấp phát động trong runtime","Mã chương trình tĩnh","Chỉ stack frames","Chỉ PCB"],"answer":0,"explain":"Heap là vùng bộ nhớ được cấp phát động trong quá trình chạy."},
+      {"id":"b3_9","lesson":3,"question":"Một chương trình có thể có nhiều process không?","options":["Có","Không bao giờ","Chỉ trên Linux","Chỉ trên Windows"],"answer":0,"explain":"Bài học nêu một program có thể có nhiều process."},
+      {"id":"b3_10","lesson":3,"question":"Trạng thái nào mô tả process đang được tạo?","options":["New","Ready","Waiting","Running"],"answer":0,"explain":"New là tiến trình đang được tạo."},
+      {"id":"b3_11","lesson":3,"question":"Trạng thái nào mô tả process đang chờ được cấp CPU?","options":["Ready","Running","Waiting","Terminated"],"answer":0,"explain":"Ready là process chờ được cấp phát cho một bộ xử lý."},
+      {"id":"b3_12","lesson":3,"question":"Trạng thái nào là process đang chờ một sự kiện?","options":["Waiting","Ready","New","Running"],"answer":0,"explain":"Waiting là process đang chờ một sự kiện xảy ra."},
+      {"id":"b3_13","lesson":3,"question":"Trạng thái nào là process đã hoàn tất thực thi?","options":["Terminated","New","Waiting","Ready"],"answer":0,"explain":"Terminated là process đã hoàn tất thực thi."},
+      {"id":"b3_14","lesson":3,"question":"PCB là gì?","options":["Khối điều khiển tiến trình lưu thông tin liên quan đến process","Một loại bộ nhớ cache","Một system call","Một shell"],"answer":0,"explain":"PCB (Process Control Block) chứa thông tin liên quan đến mỗi process."},
+      {"id":"b3_15","lesson":3,"question":"PCB chứa Program Counter để làm gì?","options":["Xác định vị trí lệnh sẽ thực thi tiếp theo","Đếm số process","Quản lý file","Lưu IP"],"answer":0,"explain":"Program Counter trong PCB chỉ vị trí lệnh tiếp theo."},
+      {"id":"b3_16","lesson":3,"question":"Thông tin nào trong PCB liên quan đến priority và các con trỏ hàng đợi?","options":["CPU Scheduling Information","Accounting Information","I/O Status Information","Memory-Management Information"],"answer":0,"explain":"CPU Scheduling Information gồm priority và con trỏ đến các scheduling queues."},
+      {"id":"b3_17","lesson":3,"question":"Thông tin nào trong PCB mô tả vùng nhớ được cấp cho process?","options":["Memory-Management Information","Accounting Information","I/O Status Information","CPU Scheduling Information"],"answer":0,"explain":"Đó là Memory-Management Information."},
+      {"id":"b3_18","lesson":3,"question":"I/O Status Information trong PCB có thể chứa gì?","options":["Thiết bị I/O được cấp phát và danh sách file đang mở","Chỉ priority","Chỉ stack pointer","Chỉ thời gian CPU"],"answer":0,"explain":"PCB lưu các thiết bị I/O được cấp và danh sách file mở."},
+      {"id":"b3_19","lesson":3,"question":"Process Scheduler chọn process từ đâu để thực thi tiếp?","options":["Ready processes","Terminated processes","File system","Waiting queue only"],"answer":0,"explain":"Process Scheduler lựa chọn trong số các process sẵn sàng."},
+      {"id":"b3_20","lesson":3,"question":"Ready Queue là tập hợp các process nào?","options":["Nằm trong main memory, sẵn sàng và chờ thực thi","Đang chờ I/O ngoài đĩa","Đã kết thúc","Chưa được tạo"],"answer":0,"explain":"Ready Queue gồm process trong main memory, sẵn sàng và chờ thực thi."},
+      {"id":"b3_21","lesson":3,"question":"Wait Queue chứa process nào?","options":["Đang chờ một sự kiện, ví dụ I/O","Đang chạy trên CPU","Đã kết thúc","Chưa nạp vào bộ nhớ"],"answer":0,"explain":"Wait Queue gồm các process chờ sự kiện như I/O."},
+      {"id":"b3_22","lesson":3,"question":"Context switch xảy ra khi nào?","options":["CPU chuyển từ process này sang process khác","Một file được tạo","Một process được tạo trên đĩa","Người dùng đổi GUI"],"answer":0,"explain":"Context switch xảy ra khi CPU chuyển sang process khác."},
+      {"id":"b3_23","lesson":3,"question":"Trong context switch, hệ thống phải làm gì?","options":["Lưu trạng thái process cũ và nạp trạng thái process mới","Xóa PCB","Xóa cả kernel","Tắt toàn bộ CPU"],"answer":0,"explain":"Context switch save state cũ và load saved state của process mới."},
+      {"id":"b3_24","lesson":3,"question":"Ngữ cảnh của process được biểu diễn trong đâu?","options":["PCB","Ready Queue","Heap","File descriptor only"],"answer":0,"explain":"Context của process được biểu diễn trong PCB."},
+      {"id":"b3_25","lesson":3,"question":"Context-switch time được xem là gì?","options":["Pure overhead","CPU utilization","Turnaround time","Response time"],"answer":0,"explain":"Trong context switching hệ thống không làm công việc hữu ích nên đây là overhead."},
+      {"id":"b3_26","lesson":3,"question":"Parent process tạo children tạo thành cấu trúc gì?","options":["Process Tree","Ready Tree","File Tree","Memory Tree"],"answer":0,"explain":"Các process cha-con tạo thành một Process Tree."},
+      {"id":"b3_27","lesson":3,"question":"PID dùng để làm gì?","options":["Xác định và quản lý process","Lưu file","Lập lịch CPU","Tạo GUI"],"answer":0,"explain":"Process Identifier (PID) dùng để xác định và quản lý process."},
+      {"id":"b3_28","lesson":3,"question":"System call nào trong UNIX tạo process mới?","options":["fork()","exec()","wait()","exit()"],"answer":0,"explain":"fork() tạo một process mới."},
+      {"id":"b3_29","lesson":3,"question":"exec() sau fork() được dùng để làm gì?","options":["Thay thế address space của process bằng một chương trình mới","Tạo thêm PID","Chờ child","Giải phóng tài nguyên"],"answer":0,"explain":"exec() thay thế không gian bộ nhớ process bằng chương trình mới."},
+      {"id":"b3_30","lesson":3,"question":"wait() được dùng để làm gì trong ví dụ process creation?","options":["Parent chờ child kết thúc","Tạo child","Thay thế code","Nạp kernel"],"answer":0,"explain":"Parent gọi wait() để chờ child kết thúc."},
+      {"id":"b3_31","lesson":3,"question":"Lời gọi hệ thống nào yêu cầu OS xóa process sau khi chạy xong?","options":["exit()","fork()","exec()","wait()"],"answer":0,"explain":"Process thực thi lệnh cuối rồi gọi exit()."},
+      {"id":"b3_32","lesson":3,"question":"abort() có thể được parent dùng để làm gì?","options":["Chấm dứt child process","Tạo child","Đổi tên process","Mở file"],"answer":0,"explain":"Parent có thể dùng abort() để chấm dứt child."},
+      {"id":"b3_33","lesson":3,"question":"Nếu parent không gọi wait() và child đã kết thúc, child được gọi là gì?","options":["Zombie Process","Orphan Process","Ready Process","Daemon"],"answer":0,"explain":"Child kết thúc nhưng chưa được parent thu nhận qua wait() là zombie."},
+      {"id":"b3_34","lesson":3,"question":"Nếu parent kết thúc mà không gọi wait(), child được gọi là gì?","options":["Orphan Process","Zombie Process","Kernel Thread","Daemon"],"answer":0,"explain":"Bài học gọi child trong trường hợp này là orphan process."},
+      {"id":"b3_35","lesson":3,"question":"IPC là viết tắt của gì?","options":["Interprocess Communication","Internal Process Control","Input Process Cache","Interprogram CPU"],"answer":0,"explain":"IPC là Interprocess Communication."},
+      {"id":"b3_36","lesson":3,"question":"Hai mô hình IPC chính được nêu là gì?","options":["Shared Memory và Message Passing","FCFS và SJF","Mutex và Monitor","CLI và GUI"],"answer":0,"explain":"Bài học nêu hai mô hình Shared Memory và Message Passing."},
+      {"id":"b3_37","lesson":3,"question":"Trong Shared Memory IPC, giao tiếp được kiểm soát chủ yếu bởi ai?","options":["Các process người dùng","Chỉ kernel","Chỉ GPU","Chỉ BIOS"],"answer":0,"explain":"Bài học nêu giao tiếp nằm dưới sự kiểm soát của các process người dùng."},
+      {"id":"b3_38","lesson":3,"question":"Trong Message Passing, hai thao tác cơ bản là gì?","options":["send() và receive()","fork() và exec()","open() và close()","lock() và unlock()"],"answer":0,"explain":"Message Passing cung cấp send(message) và receive(message)."},
+      {"id":"b3_39","lesson":3,"question":"Trong direct communication, process phải làm gì?","options":["Chỉ rõ tên của nhau","Chia sẻ cùng mailbox","Dùng GUI","Dùng chung PID"],"answer":0,"explain":"Direct communication dùng send(P,message) và receive(Q,message), chỉ rõ process đối tác."},
+      {"id":"b3_40","lesson":3,"question":"Trong indirect communication, message được gửi tới đâu?","options":["Mailbox/Port","PID","PCB","CPU core"],"answer":0,"explain":"Indirect communication gửi/nhận message qua mailbox (port)."},
+      {"id":"b3_41","lesson":3,"question":"Một mailbox có thể có đặc điểm nào?","options":["Có một ID duy nhất","Không có ID","Chỉ dùng cho một process duy nhất","Chỉ dùng trên Windows"],"answer":0,"explain":"Mỗi mailbox có một Unique ID."},
+      {"id":"b3_42","lesson":3,"question":"Blocking send được xem là gì?","options":["Đồng bộ (Synchronous)","Bất đồng bộ","Preemptive","Nonpreemptive"],"answer":0,"explain":"Blocking được xem là synchronous."},
+      {"id":"b3_43","lesson":3,"question":"Blocking send làm process gửi bị chặn cho đến khi nào?","options":["Thông điệp được nhận","CPU rảnh","File mở","Kernel dừng"],"answer":0,"explain":"Blocking send chờ cho đến khi message được nhận."},
+      {"id":"b3_44","lesson":3,"question":"Non-blocking receive có thể trả về gì?","options":["Valid message hoặc null message","Chỉ PID","Chỉ file","Chỉ semaphore"],"answer":0,"explain":"Non-blocking receive nhận valid message hoặc null message."},
+      {"id":"b3_45","lesson":3,"question":"Khi cả send và receive đều blocking, cơ chế này được gọi là gì?","options":["Rendezvous","Aging","Starvation","Spooling"],"answer":0,"explain":"Cả send và receive blocking tạo thành rendezvous."},
+      {"id":"b3_46","lesson":3,"question":"Zero-capacity link có đặc điểm gì?","options":["Không xếp hàng message; sender phải chờ receiver","Cho phép vô hạn message","Sender không bao giờ chờ","Luôn dùng mailbox"],"answer":0,"explain":"Zero Capacity không có message xếp hàng và sender phải chờ receiver."},
+      {"id":"b3_47","lesson":3,"question":"Bounded-capacity link yêu cầu sender chờ khi nào?","options":["Khi liên kết đã đầy","Khi CPU rảnh","Khi có message","Khi receiver chạy"],"answer":0,"explain":"Với bounded capacity, sender phải chờ nếu link đầy."},
+      {"id":"b3_48","lesson":3,"question":"Unbounded-capacity link có đặc điểm nào?","options":["Sender không bao giờ phải chờ do link đầy","Receiver luôn bị chặn","Chỉ chứa 1 message","Luôn zero capacity"],"answer":0,"explain":"Unbounded capacity có độ dài vô hạn nên sender không chờ vì đầy."},
+      {"id":"b3_49","lesson":3,"question":"Trong POSIX shared memory, shm_open() dùng để làm gì?","options":["Tạo hoặc mở shared memory segment","Ánh xạ bộ nhớ","Đổi kích thước CPU","Tạo thread"],"answer":0,"explain":"shm_open() được dùng để tạo hoặc mở một đoạn shared memory."},
+      {"id":"b3_50","lesson":3,"question":"Trong POSIX shared memory, ftruncate() dùng để làm gì?","options":["Thiết lập kích thước đối tượng","Tạo PID","Tạo pipe","Gửi message"],"answer":0,"explain":"ftruncate() thiết lập kích thước shared-memory object."},
+      {"id":"b3_51","lesson":3,"question":"Trong POSIX shared memory, mmap() dùng để làm gì?","options":["Ánh xạ đối tượng vào địa chỉ bộ nhớ để đọc/ghi","Xóa segment","Tạo mailbox","Lập lịch process"],"answer":0,"explain":"mmap() ánh xạ đối tượng để đọc/ghi qua con trỏ trả về."},
+      {"id":"b3_52","lesson":3,"question":"Ordinary Pipe thường có đặc điểm nào?","options":["Một chiều và thường yêu cầu quan hệ cha-con","Hai chiều và không cần quan hệ","Luôn dùng qua Internet","Không có read-end"],"answer":0,"explain":"Ordinary pipes là unidirectional và thường do parent tạo để giao tiếp với child."},
+      {"id":"b3_53","lesson":3,"question":"Named Pipe khác Ordinary Pipe ở điểm nào?","options":["Không cần quan hệ cha-con và giao tiếp hai chiều","Chỉ một chiều","Chỉ dùng trong cùng process","Không có trên UNIX"],"answer":0,"explain":"Named pipes bidirectional, không cần parent-child và nhiều process có thể sử dụng."},
+      {"id":"b3_54","lesson":3,"question":"Trong multithreaded application, một tác vụ nào có thể giao cho thread riêng?","options":["Cập nhật giao diện hoặc phản hồi yêu cầu mạng","Thay đổi CPU vật lý","Nạp BIOS","Tắt nguồn"],"answer":0,"explain":"Bài học liệt kê UI update, lấy dữ liệu, spell-check và phản hồi mạng là tác vụ cho các thread riêng."},
+      {"id":"b3_55","lesson":3,"question":"Thread creation so với process creation có chi phí thế nào?","options":["Thường thấp hơn","Luôn cao hơn","Bằng tuyệt đối","Không có chi phí"],"answer":0,"explain":"Bài học nêu process creation có chi phí cao, thread creation thấp hơn."},
+      {"id":"b3_56","lesson":3,"question":"Lợi ích nào của multithreading cho phép ứng dụng tiếp tục khi một phần bị chặn?","options":["Responsiveness","Accounting","Protection","Relocation"],"answer":0,"explain":"Responsiveness cho phép tiếp tục thực thi khi một phần process bị chặn."},
+      {"id":"b3_57","lesson":3,"question":"Ba thư viện user-level threads chính được nêu là gì?","options":["Pthreads, Windows Threads, Java Threads","POSIX, BSD, Cocoa","Win32, GTK, Qt","JVM, CLR, Dalvik"],"answer":0,"explain":"Bài học liệt kê Pthreads, Windows Threads và Java Threads."},
+      {"id":"b3_58","lesson":3,"question":"Kernel threads được hỗ trợ bởi ai?","options":["Kernel","Chỉ ứng dụng","Chỉ shell","Chỉ compiler"],"answer":0,"explain":"Kernel threads được kernel hỗ trợ."},
+      {"id":"b3_59","lesson":3,"question":"Many-to-One ánh xạ như thế nào?","options":["Nhiều user threads vào một kernel thread","Một user thread vào nhiều kernel threads","Một user thread vào một kernel thread","Không có ánh xạ"],"answer":0,"explain":"Many-to-One maps multiple user threads to one kernel thread."},
+
+      // Bài 4
+      {"id":"b4_1","lesson":4,"question":"CPU Scheduler chọn process từ đâu?","options":["Ready queue","Wait queue only","Terminated queue","File table"],"answer":0,"explain":"CPU Scheduler chọn một process trong ready queue và cấp CPU core."},
+      {"id":"b4_2","lesson":4,"question":"CPU Scheduler có thể ra quyết định khi process chuyển Running -> Waiting không?","options":["Có","Không","Chỉ trên Windows","Chỉ trên Linux"],"answer":0,"explain":"Đây là một trong bốn thời điểm quyết định lập lịch được nêu."},
+      {"id":"b4_3","lesson":4,"question":"Khi Running -> Waiting, scheduler có còn lựa chọn process đang chạy cũ không?","options":["Không, phải chọn process mới nếu có","Có thể giữ nguyên process cũ","Luôn chọn process có priority thấp","Luôn chọn SJF"],"answer":0,"explain":"Với trường hợp 1 và 4, không có lựa chọn; phải chọn process mới nếu có trong ready queue."},
+      {"id":"b4_4","lesson":4,"question":"Preemptive scheduling xảy ra ở những trường hợp nào trong bốn chuyển trạng thái được nêu?","options":["Running -> Ready và Waiting -> Ready","Running -> Waiting và Terminated","Chỉ Terminated","Chỉ Running -> Waiting"],"answer":0,"explain":"Trường hợp 2 và 3 có lựa chọn nên là cơ sở của preemptive scheduling."},
+      {"id":"b4_5","lesson":4,"question":"Nonpreemptive scheduling có đặc điểm gì?","options":["Process giữ CPU đến khi tự giải phóng bằng terminate hoặc chuyển waiting","Process luôn bị cắt sau q ms","Luôn dùng priority","Không có ready queue"],"answer":0,"explain":"Nonpreemptive: process giữ CPU cho đến khi tự giải phóng CPU."},
+      {"id":"b4_6","lesson":4,"question":"Hệ điều hành hiện đại nào được nêu sử dụng preemptive scheduling?","options":["Windows, macOS, Linux và UNIX","Chỉ DOS","Chỉ Arduino","Chỉ BIOS"],"answer":0,"explain":"Slide nêu Windows, macOS, Linux và UNIX đều sử dụng thuật toán preemptive."},
+      {"id":"b4_7","lesson":4,"question":"Preemptive scheduling có thể gây vấn đề gì với dữ liệu chia sẻ?","options":["Race condition","Linker error","Relocation","GUI conflict"],"answer":0,"explain":"Preemption khi dữ liệu chia sẻ có thể dẫn đến race condition."},
+      {"id":"b4_8","lesson":4,"question":"Dispatcher làm nhiệm vụ gì?","options":["Trao quyền điều khiển CPU cho process được scheduler chọn","Tạo file","Nạp driver","Chọn shell"],"answer":0,"explain":"Dispatcher transfer control of CPU cho process được CPU scheduler lựa chọn."},
+      {"id":"b4_9","lesson":4,"question":"Công việc nào KHÔNG thuộc Dispatcher theo bài?","options":["Biên dịch chương trình","Context switching","Chuyển user mode","Nhảy tới vị trí thích hợp trong chương trình"],"answer":0,"explain":"Dispatcher làm context switch, chuyển user mode và jump đến vị trí thích hợp; biên dịch không thuộc dispatcher."},
+      {"id":"b4_10","lesson":4,"question":"Dispatch latency là gì?","options":["Thời gian dừng một process và bắt đầu process khác","Thời gian process chờ trong ready queue","Tổng runtime process","Thời gian phản hồi đầu tiên"],"answer":0,"explain":"Dispatch latency là thời gian cần để dispatcher dừng process này và bắt đầu process khác."},
+      {"id":"b4_11","lesson":4,"question":"CPU utilization được tối ưu theo hướng nào?","options":["Maximize","Minimize","Bằng 0","Không quan tâm"],"answer":0,"explain":"Tiêu chí tối ưu hóa là Max CPU utilization."},
+      {"id":"b4_12","lesson":4,"question":"Throughput là gì?","options":["Số process hoàn thành trong một đơn vị thời gian","Thời gian process chờ","Thời gian từ request đến phản hồi đầu tiên","Tổng CPU burst"],"answer":0,"explain":"Throughput là số process hoàn thành trong một đơn vị thời gian."},
+      {"id":"b4_13","lesson":4,"question":"Waiting time là gì?","options":["Thời gian process chờ trong ready queue","Tổng thời gian thực thi","Thời gian từ request đến phản hồi đầu tiên","Thời gian dispatch"],"answer":0,"explain":"Waiting time là thời gian process chờ trong ready queue."},
+      {"id":"b4_14","lesson":4,"question":"Response time là gì?","options":["Từ lúc request đến khi nhận phản hồi đầu tiên","Từ arrival đến terminate","Tổng thời gian ready","Thời gian context switch"],"answer":0,"explain":"Response time tính từ lúc yêu cầu được gửi đến khi nhận phản hồi đầu tiên."},
+      {"id":"b4_15","lesson":4,"question":"Turnaround time là gì?","options":["Tổng thời gian cần thiết để process hoàn thành thực thi","Chỉ waiting time","Chỉ response time","Chỉ CPU burst đầu tiên"],"answer":0,"explain":"Turnaround time là tổng thời gian từ khi process bắt đầu đến khi hoàn thành theo định nghĩa bài."},
+      {"id":"b4_16","lesson":4,"question":"Trong FCFS, process nào được chạy trước?","options":["Process đến trước","Process burst ngắn nhất","Process priority thấp nhất","Process mới nhất"],"answer":0,"explain":"FCFS = First-Come, First-Served."},
+      {"id":"b4_17","lesson":4,"question":"Với FCFS, P1=24, P2=3, P3=3 và thứ tự đến P1,P2,P3, thời gian chờ trung bình là bao nhiêu?","options":["17","3","10","27"],"answer":0,"explain":"Waiting times là 0,24,27 nên trung bình = (0+24+27)/3 = 17."},
+      {"id":"b4_18","lesson":4,"question":"Với cùng ba process trên nhưng thứ tự P2,P3,P1, average waiting time FCFS là bao nhiêu?","options":["3","17","6","24"],"answer":0,"explain":"Waiting times là 0,3,6 nên trung bình = 3."},
+      {"id":"b4_19","lesson":4,"question":"Convoy effect là gì?","options":["Process ngắn phải đứng sau process dài trong queue","Process dài đứng sau process ngắn","Priority tăng dần theo thời gian","CPU đổi mode"],"answer":0,"explain":"Convoy effect là hiện tượng process ngắn xếp sau process dài."},
+      {"id":"b4_20","lesson":4,"question":"SJF chọn process dựa trên gì?","options":["CPU burst tiếp theo ngắn nhất","PID nhỏ nhất","Priority lớn nhất","Arrival time mới nhất"],"answer":0,"explain":"SJF dùng độ dài CPU burst tiếp theo và chọn burst ngắn nhất."},
+      {"id":"b4_21","lesson":4,"question":"SJF được gọi là tối ưu vì lý do gì?","options":["Cho average waiting time nhỏ nhất với tập process cho trước","Luôn có response time lớn nhất","Không có preemption","Không cần burst estimate"],"answer":0,"explain":"Bài học nêu SJF là optimal vì average waiting time nhỏ nhất cho tập process cho trước."},
+      {"id":"b4_22","lesson":4,"question":"SRTF là phiên bản nào của SJF?","options":["Preemptive","Nonpreemptive","Batch","Multilevel"],"answer":0,"explain":"SRTF là preemptive version of SJF."},
+      {"id":"b4_23","lesson":4,"question":"SRTF sẽ tước CPU của process đang chạy khi nào?","options":["Process mới có thời gian còn lại ngắn hơn","Process mới có priority thấp hơn","CPU rảnh","Queue trống"],"answer":0,"explain":"Nếu process mới có CPU burst dự kiến ngắn hơn thời gian còn lại, SRTF preempt process đang chạy."},
+      {"id":"b4_24","lesson":4,"question":"Trong exponential averaging, α thường được gán giá trị nào?","options":["1/2","0","1","2"],"answer":0,"explain":"Slide nêu thông thường α được gán 1/2."},
+      {"id":"b4_25","lesson":4,"question":"Khi α = 0 trong exponential averaging, điều gì xảy ra?","options":["τn+1 = τn; recent history does not count","Chỉ burst gần nhất được tính","τn+1 = tn","Không có dự báo"],"answer":0,"explain":"Với α=0, dự báo bằng giá trị trước đó và recent history không được tính."},
+      {"id":"b4_26","lesson":4,"question":"Khi α = 1, τn+1 bằng gì?","options":["tn","τn","0","τ0"],"answer":0,"explain":"Với α=1, chỉ CPU burst thực tế gần nhất được tính: τn+1 = tn."},
+      {"id":"b4_27","lesson":4,"question":"Round Robin cấp cho mỗi process gì?","options":["Time quantum q","Priority duy nhất","Một PCB mới","Một mailbox"],"answer":0,"explain":"Mỗi process được cấp một khoảng CPU nhỏ gọi là time quantum q."},
+      {"id":"b4_28","lesson":4,"question":"Time quantum trong bài thường nằm khoảng nào?","options":["10–100 ms","1–5 s","1–10 µs","100–500 s"],"answer":0,"explain":"Bài học nêu q thường từ 10 đến 100 milliseconds."},
+      {"id":"b4_29","lesson":4,"question":"Sau khi time quantum kết thúc, process trong RR thường được làm gì?","options":["Bị preempt và đưa xuống cuối ready queue","Terminate ngay","Đưa lên đầu queue","Chuyển thành zombie"],"answer":0,"explain":"RR preempt process sau q và đưa nó xuống cuối ready queue."},
+      {"id":"b4_30","lesson":4,"question":"Nếu q rất lớn, RR sẽ gần với thuật toán nào?","options":["FCFS/FIFO","SJF","SRTF","Priority aging"],"answer":0,"explain":"q lớn làm RR hoạt động gần giống FIFO/FCFS."},
+      {"id":"b4_31","lesson":4,"question":"Nếu q quá nhỏ, vấn đề gì xảy ra?","options":["Context-switch overhead cao và hiệu năng giảm","Không có preemption","CPU utilization luôn 100%","Không còn ready queue"],"answer":0,"explain":"q quá nhỏ làm chi phí context switch/overhead cao và giảm performance."},
+      {"id":"b4_32","lesson":4,"question":"Priority scheduling trong slide dùng quy ước nào?","options":["Số nguyên nhỏ hơn nghĩa là priority cao hơn","Số lớn hơn luôn cao hơn","Priority càng âm càng thấp","Không có quy ước"],"answer":0,"explain":"Slide nêu số nguyên nhỏ nhất có priority cao nhất."},
+      {"id":"b4_33","lesson":4,"question":"Starvation trong priority scheduling nghĩa là gì?","options":["Process priority thấp có thể không bao giờ được thực thi","Process chết ngay","CPU không chạy","Queue bị xóa"],"answer":0,"explain":"Starvation xảy ra khi process có priority thấp có thể chờ vô hạn."},
+      {"id":"b4_34","lesson":4,"question":"Aging được dùng để giải quyết vấn đề nào?","options":["Starvation","Relocation","Context switch","Linker error"],"answer":0,"explain":"Aging tăng dần priority theo thời gian giúp process thấp priority cuối cùng được chạy."},
+      {"id":"b4_35","lesson":4,"question":"Priority Scheduling with Round-Robin xử lý các process cùng priority như thế nào?","options":["Bằng Round Robin","Bằng SJF","Bằng FCFS tuyệt đối","Bằng SRTF"],"answer":0,"explain":"Các process cùng mức priority được thực thi theo RR."},
+      {"id":"b4_36","lesson":4,"question":"Multilevel Queue có đặc điểm gì?","options":["Ready queue gồm nhiều queue khác nhau","Chỉ có một queue","Process luôn di chuyển giữa queue","Không có priority"],"answer":0,"explain":"Multilevel Queue có nhiều ready queue khác nhau."},
+      {"id":"b4_37","lesson":4,"question":"Multilevel Feedback Queue khác Multilevel Queue ở điểm quan trọng nào?","options":["Một process có thể di chuyển giữa các queue","Không có queue","Chỉ dùng FCFS","Không có priority"],"answer":0,"explain":"MLFQ cho phép process di chuyển giữa các hàng đợi."},
+      {"id":"b4_38","lesson":4,"question":"Trong ví dụ MLFQ, queue Q0 dùng thuật toán nào và q bao nhiêu?","options":["Round Robin, 8 ms","FCFS, 8 ms","RR, 16 ms","SJF, 4 ms"],"answer":0,"explain":"Ví dụ: Q0 RR với time quantum 8 ms."},
+      {"id":"b4_39","lesson":4,"question":"Trong ví dụ MLFQ, Q1 dùng gì?","options":["Round Robin, 16 ms","FCFS, 16 ms","SRTF, 8 ms","Priority, 4 ms"],"answer":0,"explain":"Ví dụ: Q1 RR với q=16 ms."},
+      {"id":"b4_40","lesson":4,"question":"Trong ví dụ MLFQ, Q2 dùng thuật toán nào?","options":["FCFS","Round Robin","SJF","SRTF"],"answer":0,"explain":"Q2 trong ví dụ dùng First-Come, First-Served."},
+      {"id":"b4_41","lesson":4,"question":"Trong Pthread Scheduling, PTHREAD_SCOPE_PROCESS tương ứng với gì?","options":["Process Contention Scope (PCS)","System Contention Scope (SCS)","FCFS","RR"],"answer":0,"explain":"PTHREAD_SCOPE_PROCESS là phạm vi tranh chấp tiến trình."},
+      {"id":"b4_42","lesson":4,"question":"PTHREAD_SCOPE_SYSTEM tương ứng với gì?","options":["System Contention Scope (SCS)","Process Contention Scope","SJF","MLFQ"],"answer":0,"explain":"PTHREAD_SCOPE_SYSTEM là phạm vi tranh chấp hệ thống."},
+      {"id":"b4_43","lesson":4,"question":"Theo bài, Linux và macOS chỉ cho phép scope nào?","options":["PTHREAD_SCOPE_SYSTEM","PTHREAD_SCOPE_PROCESS","Cả hai","Không có thread scheduling"],"answer":0,"explain":"Slide nêu Linux và macOS chỉ cho phép PTHREAD_SCOPE_SYSTEM."},
+      {"id":"b4_44","lesson":4,"question":"Trong SMP, đặc điểm nào được nêu?","options":["Mỗi processor tự thực hiện scheduling","Chỉ một processor scheduling","Không có ready queue","Chỉ GPU lập lịch"],"answer":0,"explain":"SMP (symmetric multiprocessing) là kiến trúc mỗi processor tự lập lịch."},
+      {"id":"b4_45","lesson":4,"question":"Trên hệ thống 4 lõi với 2 hardware threads mỗi lõi, OS nhìn thấy bao nhiêu logical processors?","options":["8","4","2","6"],"answer":0,"explain":"4 cores × 2 hardware threads/core = 8 logical processors."},
+      {"id":"b4_46","lesson":4,"question":"Soft real-time system có đặc điểm gì?","options":["Task quan trọng có priority cao nhưng không đảm bảo deadline","Mọi task phải trước deadline","Không có priority","Không có scheduling"],"answer":0,"explain":"Soft real-time ưu tiên task quan trọng nhưng không đảm bảo thời điểm thực thi."},
+      {"id":"b4_47","lesson":4,"question":"Hard real-time system yêu cầu gì?","options":["Task phải được phục vụ trước deadline","Chỉ cần priority cao","Chỉ cần CPU utilization cao","Không cần latency"],"answer":0,"explain":"Hard real-time yêu cầu nhiệm vụ được phục vụ trước deadline."},
+      {"id":"b4_48","lesson":4,"question":"Interrupt latency là khoảng thời gian nào?","options":["Từ khi interrupt xuất hiện đến khi bắt đầu chạy interrupt handler","Từ arrival đến terminate","Từ request đến response","Từ queue đến disk"],"answer":0,"explain":"Interrupt latency là thời gian từ interrupt xuất hiện đến khi bắt đầu xử lý interrupt."},
+      {"id":"b4_49","lesson":4,"question":"Dispatch latency là gì trong real-time scheduling?","options":["Thời gian scheduler đưa process hiện tại ra khỏi CPU và chuyển sang process khác","Thời gian interrupt xuất hiện","Thời gian file mở","Thời gian CPU burst"],"answer":0,"explain":"Dispatch latency là thời gian scheduler chuyển từ process hiện tại sang process khác."},
+
+      // Bài 5
+      {"id":"b5_1","lesson":5,"question":"Race condition là gì trong ví dụ bounded buffer?","options":["Kết quả phụ thuộc vào thứ tự xen kẽ của các thao tác đồng thời","CPU luôn bị lỗi","File bị xóa","Process luôn terminate"],"answer":0,"explain":"Các thao tác đồng thời trên dữ liệu chia sẻ có thể tạo timing/race condition và kết quả không nhất quán."},
+      {"id":"b5_2","lesson":5,"question":"Nếu count ban đầu bằng 5 và producer/consumer đồng thời thực hiện count++ và count--, trạng thái sai nào có thể xuất hiện?","options":["count == 4 hoặc count == 6","count == 5 luôn luôn","count == 0 בלבד","count == 10 luôn luôn"],"answer":0,"explain":"Slide minh họa có thể thu được count=4 hoặc count=6 thay vì 5."},
+      {"id":"b5_3","lesson":5,"question":"Critical section là gì?","options":["Đoạn mã có thể thay đổi dữ liệu dùng chung, cập nhật bảng, ghi file...","Toàn bộ chương trình","Chỉ phần GUI","Chỉ kernel"],"answer":0,"explain":"Mỗi process có đoạn mã gọi là critical section nơi có thể sửa dữ liệu shared."},
+      {"id":"b5_4","lesson":5,"question":"Trong Critical-Section Problem, khi một process ở critical section thì điều gì phải đúng?","options":["Không process nào khác được ở critical section của nó","Mọi process phải chạy","CPU phải tắt","Queue phải rỗng"],"answer":0,"explain":"Yêu cầu mutual exclusion: chỉ một process ở critical section tại một thời điểm."},
+      {"id":"b5_5","lesson":5,"question":"Critical-Section Problem là gì?","options":["Thiết kế giao thức để kiểm soát việc vào critical section","Thiết kế file system","Thiết kế GUI","Thiết kế compiler"],"answer":0,"explain":"Bài học định nghĩa đây là bài toán thiết kế protocol giải quyết truy cập critical section."},
+      {"id":"b5_6","lesson":5,"question":"Ba yêu cầu của lời giải Critical-Section Problem là gì?","options":["Mutual Exclusion, Progress, Bounded Waiting","FCFS, SJF, RR","Send, Receive, Wait","Load, Store, Execute"],"answer":0,"explain":"Bài học liệt kê đúng ba yêu cầu này."},
+      {"id":"b5_7","lesson":5,"question":"Mutual Exclusion đảm bảo điều gì?","options":["Không có hai process cùng ở critical section","Không process nào được chạy","Process phải có priority cao","Mọi waiting đều bị cấm"],"answer":0,"explain":"Mutual Exclusion ngăn các process khác đồng thời vào critical section."},
+      {"id":"b5_8","lesson":5,"question":"Progress yêu cầu điều gì?","options":["Nếu không ai ở CS mà có process muốn vào, việc chọn process tiếp theo không bị trì hoãn vô hạn","Mọi process phải vào CS cùng lúc","Không process nào được chờ","CPU phải chạy 100%"],"answer":0,"explain":"Progress cấm trì hoãn vô thời hạn khi có process muốn vào CS và CS đang rảnh."},
+      {"id":"b5_9","lesson":5,"question":"Bounded Waiting yêu cầu điều gì?","options":["Tồn tại giới hạn số lần process khác được vào CS trước khi yêu cầu của process được chấp thuận","Không ai được vào CS","Chỉ cho một process chạy mãi","Không có waiting queue"],"answer":0,"explain":"Bounded waiting yêu cầu có một giới hạn cho số lần process khác được vào CS trước khi yêu cầu được chấp thuận."},
+      {"id":"b5_10","lesson":5,"question":"Race condition trên next_available_pid có thể dẫn đến hậu quả gì?","options":["Hai process có thể được gán cùng một PID","CPU bị ngắt vĩnh viễn","Tạo thêm RAM","Không có tiến trình"],"answer":0,"explain":"Nếu P0 và P1 truy cập đồng thời mà không bảo vệ, cùng PID có thể được cấp cho hai process."},
+      {"id":"b5_11","lesson":5,"question":"Interrupt-based solution dùng gì ở entry section?","options":["Disable interrupts","Enable interrupts","wait()","signal()"],"answer":0,"explain":"Entry section disable interrupts; exit section enable interrupts."},
+      {"id":"b5_12","lesson":5,"question":"Một hạn chế của interrupt-based solution được nêu là gì?","options":["Có thể gây starvation và không phù hợp cho nhiều CPU","Luôn nhanh hơn mọi giải pháp","Không cần CPU","Không hoạt động trên 1 CPU"],"answer":0,"explain":"Slide nêu vấn đề nếu CS dài có thể starvation và đặt câu hỏi với hai CPU."},
+      {"id":"b5_13","lesson":5,"question":"Software Solution 1 cho hai process dùng biến nào?","options":["turn","flag[2]","mutex","count"],"answer":0,"explain":"Hai process chia sẻ biến int turn."},
+      {"id":"b5_14","lesson":5,"question":"Biến turn trong Software Solution 1 cho biết gì?","options":["Đến lượt process nào vào critical section","Process nào terminate","Số buffer đầy","Priority"],"answer":0,"explain":"turn xác định đến lượt process nào vào CS."},
+      {"id":"b5_15","lesson":5,"question":"Peterson's Solution sử dụng hai biến nào?","options":["turn và flag[2]","mutex và count","PID và PC","lock và semaphore"],"answer":0,"explain":"Peterson dùng int turn và boolean flag[2]."},
+      {"id":"b5_16","lesson":5,"question":"Trong Peterson, flag[i] = true có nghĩa gì?","options":["Pi sẵn sàng vào critical section","Pi đã terminate","Pi đang waiting I/O","Pi đang ở kernel mode"],"answer":0,"explain":"flag[i]=true báo process Pi sẵn sàng vào CS."},
+      {"id":"b5_17","lesson":5,"question":"Peterson's Solution đảm bảo yêu cầu nào?","options":["Mutual exclusion, Progress và Bounded waiting","Chỉ mutual exclusion","Chỉ progress","Chỉ waiting"],"answer":0,"explain":"Slide cho biết có thể chứng minh cả ba yêu cầu đều được đáp ứng."},
+      {"id":"b5_18","lesson":5,"question":"Peterson's Solution trên kiến trúc hiện đại có vấn đề gì?","options":["Không được đảm bảo hoạt động chính xác do reordering của processor/compiler","Luôn an toàn hơn hardware","Không thể dùng flag","Chỉ chạy trên Windows"],"answer":0,"explain":"Bài học nêu modern architectures có thể reorder independent operations nên Peterson không được đảm bảo."},
+      {"id":"b5_19","lesson":5,"question":"Công cụ nào có thể giúp Peterson hoạt động đúng trên kiến trúc hiện đại?","options":["Memory Barrier","GUI","Loader","PCB"],"answer":0,"explain":"Slide nêu thường phải sử dụng memory barrier."},
+      {"id":"b5_20","lesson":5,"question":"Trong ví dụ modern architecture, nếu x=100 và flag=true có thể bị reorder thành flag=true trước x=100 thì Thread 1 có thể in gì?","options":["0","100 luôn luôn","1","Không in gì"],"answer":0,"explain":"Do reorder, Thread 1 có thể thấy flag=true trước khi x=100 hiển thị và in 0."},
+      {"id":"b5_21","lesson":5,"question":"Memory model strongly ordered nghĩa là gì?","options":["Thay đổi bộ nhớ của một processor được hiển thị ngay lập tức cho các processor khác","Không bao giờ hiển thị","Chỉ hiển thị khi reboot","Chỉ hiển thị trên disk"],"answer":0,"explain":"Strongly ordered: thay đổi bộ nhớ được hiển thị ngay lập tức cho các processor khác."},
+      {"id":"b5_22","lesson":5,"question":"Memory model weakly ordered nghĩa là gì?","options":["Thay đổi bộ nhớ có thể chưa hiển thị ngay lập tức cho processor khác","Mọi thay đổi luôn đồng bộ ngay","Không có memory","Chỉ dành cho GPU"],"answer":0,"explain":"Weakly ordered cho phép thay đổi bộ nhớ chưa hiển thị ngay lập tức."},
+      {"id":"b5_23","lesson":5,"question":"Memory barrier làm gì?","options":["Buộc các thay đổi bộ nhớ được hiển thị và bảo đảm thứ tự load/store cần thiết","Tạo process","Khóa file","Xóa cache"],"answer":0,"explain":"Memory barrier buộc các thay đổi bộ nhớ được truyền/hiển thị và giữ thứ tự trước/sau barrier."},
+      {"id":"b5_24","lesson":5,"question":"Test-and-Set được thực hiện như thế nào?","options":["Atomic","Luôn có thể bị ngắt giữa các bước","Chỉ bằng phần mềm","Chỉ ở user mode"],"answer":0,"explain":"test_and_set là hardware instruction thực hiện nguyên tử."},
+      {"id":"b5_25","lesson":5,"question":"Test-and-Set trả về gì?","options":["Giá trị ban đầu của tham số target","Giá trị mới luôn là false","PID","Địa chỉ bộ nhớ"],"answer":0,"explain":"Đặc tính: trả về giá trị ban đầu của target."},
+      {"id":"b5_26","lesson":5,"question":"Test-and-Set đặt target thành giá trị nào?","options":["true","false","0","-1"],"answer":0,"explain":"Sau khi thực hiện, target được đặt thành true."},
+      {"id":"b5_27","lesson":5,"question":"Compare-and-Swap thay đổi value thành new_value khi nào?","options":["Khi value == expected","Khi value != expected","Luôn luôn","Khi CPU rảnh"],"answer":0,"explain":"CAS chỉ gán new_value khi value bằng expected."},
+      {"id":"b5_28","lesson":5,"question":"Compare-and-Swap có được thực hiện nguyên tử không?","options":["Có","Không","Chỉ trên single-core","Chỉ trong user mode"],"answer":0,"explain":"CAS là atomic hardware instruction."},
+      {"id":"b5_29","lesson":5,"question":"Atomic variable cung cấp khả năng gì?","options":["Cập nhật nguyên tử các kiểu dữ liệu cơ bản như integer và boolean","Chỉ lưu file","Chỉ quản lý thread","Chỉ điều khiển I/O"],"answer":0,"explain":"Atomic variable cho phép atomic update với kiểu dữ liệu cơ bản."},
+      {"id":"b5_30","lesson":5,"question":"Mutex lock bảo vệ critical section theo cách nào?","options":["Acquire lock trước CS và release lock sau CS","Release trước rồi acquire","Chỉ dùng signal","Không cần lock"],"answer":0,"explain":"Cách dùng mutex: acquire() trước CS, release() sau CS."},
+      {"id":"b5_31","lesson":5,"question":"acquire() và release() của mutex phải như thế nào?","options":["Atomic","Có thể bị ngắt tùy ý","Chỉ chạy khi CS rỗng","Không cần atomic"],"answer":0,"explain":"Các gọi acquire/release phải được thực hiện nguyên tử."},
+      {"id":"b5_32","lesson":5,"question":"Mutex lock kiểu busy waiting còn được gọi là gì?","options":["Spinlock","Semaphore","Monitor","Daemon"],"answer":0,"explain":"Loại lock này yêu cầu busy waiting nên được gọi là spinlock."},
+      {"id":"b5_33","lesson":5,"question":"Semaphore S là kiểu dữ liệu gì?","options":["Biến số nguyên","Boolean only","Pointer only","Process tree"],"answer":0,"explain":"Semaphore S là một biến số nguyên."},
+      {"id":"b5_34","lesson":5,"question":"Semaphore chỉ được truy cập qua hai thao tác nào?","options":["wait() và signal()","send() và receive()","fork() và exec()","open() và close()"],"answer":0,"explain":"Semaphore được truy cập qua wait() và signal(), còn gọi P() và V."},
+      {"id":"b5_35","lesson":5,"question":"Counting semaphore khác binary semaphore ở đâu?","options":["Counting có miền giá trị số nguyên không giới hạn; binary chỉ 0 hoặc 1","Binary không có value","Counting chỉ 0 hoặc 1","Không khác"],"answer":0,"explain":"Bài học nêu counting semaphore có miền số nguyên không giới hạn còn binary trong [0,1]."},
+      {"id":"b5_36","lesson":5,"question":"Semaphore mutex để giải quyết CS problem thường được khởi tạo bằng bao nhiêu?","options":["1","0","-1","2"],"answer":0,"explain":"Ví dụ CS dùng semaphore mutex với giá trị ban đầu = 1."},
+      {"id":"b5_37","lesson":5,"question":"Nếu dùng semaphore synch để buộc S1 xảy ra trước S2, giá trị ban đầu của synch là gì?","options":["0","1","-1","2"],"answer":0,"explain":"Ví dụ synchronization tạo synch=0; P1 signal sau S1, P2 wait trước S2."},
+      {"id":"b5_38","lesson":5,"question":"Busy waiting trong semaphore implementation có vấn đề gì?","options":["Có thể tốn CPU, đặc biệt nếu critical section dài","Luôn tiết kiệm CPU","Chỉ xảy ra khi queue rỗng","Không có vấn đề"],"answer":0,"explain":"Busy waiting gây lãng phí CPU; đặc biệt không tốt nếu ứng dụng ở CS lâu."},
+      {"id":"b5_39","lesson":5,"question":"Trong semaphore implementation không busy waiting, mỗi semaphore có gì?","options":["Waiting queue tương ứng","Một CPU riêng","Một GUI","Một compiler"],"answer":0,"explain":"Mỗi semaphore có một waiting queue tương ứng."},
+      {"id":"b5_40","lesson":5,"question":"sleep trong semaphore implementation làm gì?","options":["Đưa process gọi vào waiting queue và tạm dừng","Đánh thức process","Tăng semaphore","Xóa process"],"answer":0,"explain":"sleep đưa caller vào waiting queue thích hợp và dừng nó."},
+      {"id":"b5_41","lesson":5,"question":"wakeup làm gì?","options":["Đưa một process khỏi waiting queue vào ready queue","Đưa process vào disk","Giảm semaphore","Tạo mutex"],"answer":0,"explain":"wakeup loại process khỏi waiting queue và đưa vào ready queue."},
+      {"id":"b5_42","lesson":5,"question":"Sử dụng sai semaphore có thể là trường hợp nào?","options":["signal(mutex) rồi wait(mutex), hoặc wait hai lần","Chỉ gọi signal đúng một lần","Luôn pair wait/signal","Chỉ dùng binary semaphore"],"answer":0,"explain":"Slide liệt kê signal trước wait, wait hai lần và bỏ qua wait/signal là các lỗi sử dụng."},
+      {"id":"b5_43","lesson":5,"question":"Monitor là gì?","options":["Mức trừu tượng cao cấp để đồng bộ hóa process","Một hardware instruction","Một CPU scheduler","Một loader"],"answer":0,"explain":"Monitor là high-level abstraction cho synchronization."},
+      {"id":"b5_44","lesson":5,"question":"Trong monitor, tại một thời điểm có bao nhiêu process có thể hoạt động bên trong?","options":["Một","Hai","Vô hạn","Không process nào"],"answer":0,"explain":"Bài học nêu chỉ một process có thể hoạt động trong monitor tại một thời điểm."},
+      {"id":"b5_45","lesson":5,"question":"Trong monitor, các biến bên trong được truy cập bởi gì?","options":["Mã bên trong các procedure của monitor","Bất kỳ process ngoài nào","Chỉ BIOS","Chỉ debugger"],"answer":0,"explain":"Biến bên trong monitor chỉ có thể được truy cập bởi code bên trong procedure của monitor."},
+      {"id":"b5_46","lesson":5,"question":"Triển khai monitor bằng semaphore dùng mutex ban đầu bằng bao nhiêu?","options":["1","0","-1","2"],"answer":0,"explain":"Slide nêu semaphore mutex = 1 để đảm bảo mutual exclusion trong monitor."}
+    ];
+
+    // Local Storage Keys
+    const STORAGE_KEY = "OS_EXAM_ATTEMPT_HISTORY";
+    const WRONG_POOL_KEY = "OS_EXAM_WRONG_QUESTIONS";
+
+    let currentQuiz = [];
+    let currentIndex = 0;
+    let userAnswers = {}; 
+    let currentExamName = "Tất cả bài học";
+
+    let examHistory = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    let wrongQuestionIds = new Set(JSON.parse(localStorage.getItem(WRONG_POOL_KEY) || "[]"));
+
+    // DOM Elements
+    const qTitle = document.getElementById("q-title");
+    const optsContainer = document.getElementById("opts-container");
+    const explainBox = document.getElementById("explain-box");
+    const statProgress = document.getElementById("stat-progress");
+    const statScore = document.getElementById("stat-score");
+    const statExamName = document.getElementById("stat-exam-name");
+
+    const lessonSelect = document.getElementById("lesson-select");
+    const randomCountInput = document.getElementById("random-count");
+    const btnStartRandom = document.getElementById("btn-start-random");
+    const btnStartLesson = document.getElementById("btn-start-lesson");
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    const btnFinishExam = document.getElementById("btn-finish-exam");
+    const btnClearHistory = document.getElementById("btn-clear-history");
+    const historyTbody = document.getElementById("history-tbody");
+    
+    const shuffleQuestionsToggle = document.getElementById("shuffle-questions-toggle");
+    const shuffleOptionsToggle = document.getElementById("shuffle-options-toggle");
+    const btnReviewWrong = document.getElementById("btn-review-wrong");
+    const wrongCountBadge = document.getElementById("wrong-count-badge");
+
+    function updateWrongBadge() {
+      wrongCountBadge.textContent = wrongQuestionIds.size;
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // Xử lý đảo câu hỏi và đảo đáp án
+    function prepareQuestions(rawQuestions) {
+      const shouldShuffleQ = shuffleQuestionsToggle.checked;
+      const shouldShuffleOpt = shuffleOptionsToggle.checked;
+
+      let list = rawQuestions.map(item => {
+        if (!shouldShuffleOpt) {
+          return { ...item };
+        }
+
+        const mappedOptions = item.options.map((text, idx) => ({
+          text: text,
+          isCorrect: (idx === item.answer)
+        }));
+
+        const shuffledOptions = shuffleArray(mappedOptions);
+        const newAnswerIndex = shuffledOptions.findIndex(o => o.isCorrect);
+
+        return {
+          id: item.id,
+          lesson: item.lesson,
+          question: item.question,
+          options: shuffledOptions.map(o => o.text),
+          answer: newAnswerIndex,
+          explain: item.explain
+        };
+      });
+
+      if (shouldShuffleQ) {
+        list = shuffleArray(list);
+      }
+
+      return list;
+    }
+
+    function initQuiz(questions, examName) {
+      if (Object.keys(userAnswers).length > 0) {
+        saveCurrentExamHistory(false);
+      }
+
+      currentQuiz = prepareQuestions(questions);
+      currentIndex = 0;
+      userAnswers = {};
+      currentExamName = examName;
+      statExamName.textContent = `Đang làm: ${examName}`;
+      renderQuestion();
+      updateStats();
+    }
+
+    function filterByLesson(lessonVal) {
+      if (lessonVal === "all") return [...questionBank];
+      const lessonNum = parseInt(lessonVal);
+      return questionBank.filter(q => q.lesson === lessonNum);
+    }
+
+    btnStartLesson.addEventListener("click", () => {
+      const selected = lessonSelect.value;
+      const lessonText = lessonSelect.options[lessonSelect.selectedIndex].text;
+      const list = filterByLesson(selected);
+      initQuiz(list, lessonText);
+    });
+
+    btnStartRandom.addEventListener("click", () => {
+      const selected = lessonSelect.value;
+      const lessonText = lessonSelect.options[lessonSelect.selectedIndex].text;
+      let pool = filterByLesson(selected);
+      let count = parseInt(randomCountInput.value);
+      if (isNaN(count) || count <= 0) count = 20;
+      if (count > pool.length) count = pool.length;
+      const sliced = shuffleArray(pool).slice(0, count);
+      initQuiz(sliced, `Random ${count} câu (${lessonText})`);
+    });
+
+    // Chế độ ôn lại các câu sai
+    btnReviewWrong.addEventListener("click", () => {
+      if (wrongQuestionIds.size === 0) {
+        alert("Hiện tại không có câu sai nào trong kho ôn tập!");
+        return;
+      }
+      const wrongList = questionBank.filter(q => wrongQuestionIds.has(q.id));
+      initQuiz(wrongList, `Ôn Lại Câu Sai (${wrongList.length} câu)`);
+    });
+
+    function updateStats() {
+      const total = currentQuiz.length;
+      const answeredKeys = Object.keys(userAnswers);
+      const totalAnswered = answeredKeys.length;
+      let correct = 0;
+      answeredKeys.forEach(k => {
+        if (userAnswers[k].isCorrect) correct++;
+      });
+      const wrong = totalAnswered - correct;
+      const pct = totalAnswered > 0 ? Math.round((correct / totalAnswered) * 100) : 0;
+
+      statProgress.textContent = `Câu: ${total === 0 ? 0 : currentIndex + 1}/${total} (Đã làm: ${totalAnswered})`;
+      statScore.textContent = `Đúng: ${correct} | Sai: ${wrong} (${pct}%)`;
+    }
+
+    function renderQuestion() {
+      if (currentQuiz.length === 0) {
+        qTitle.textContent = "Không có câu hỏi nào để hiển thị.";
+        optsContainer.innerHTML = "";
+        explainBox.style.display = "none";
+        return;
+      }
+      const q = currentQuiz[currentIndex];
+      const letters = ["A", "B", "C", "D"];
+      const answered = userAnswers[currentIndex];
+
+      qTitle.textContent = `[Câu ${currentIndex + 1}/${currentQuiz.length}] - [Bài ${q.lesson}]: ${q.question}`;
+      optsContainer.innerHTML = "";
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<span class="opt-tag">${letters[optIdx]}</span> <span>${optText}</span>`;
+
+        if (answered !== undefined) {
+          btn.disabled = true;
+          if (optIdx === q.answer) {
+            btn.classList.add("show-truth");
+          }
+          if (optIdx === answered.selected) {
+            btn.classList.add(answered.isCorrect ? "selected-correct" : "selected-wrong");
+          }
+        } else {
+          btn.addEventListener("click", () => handleSelectOption(optIdx));
+        }
+
+        optsContainer.appendChild(btn);
+      });
+
+      if (answered !== undefined) {
+        explainBox.style.display = "block";
+        explainBox.innerHTML = `<strong>Giải thích đáp án:</strong> ${q.explain || "Không có giải thích chi tiết."}`;
+      } else {
+        explainBox.style.display = "none";
+        explainBox.innerHTML = "";
+      }
+
+      updateStats();
+    }
+
+    function handleSelectOption(optIdx) {
+      if (userAnswers[currentIndex] !== undefined) return;
+      const q = currentQuiz[currentIndex];
+      const isCorrect = (optIdx === q.answer);
+      userAnswers[currentIndex] = { selected: optIdx, isCorrect: isCorrect };
+
+      // Cập nhật kho câu sai
+      if (!isCorrect) {
+        wrongQuestionIds.add(q.id);
+      } else {
+        // Nếu trả lời đúng thì xóa khỏi kho câu sai
+        wrongQuestionIds.delete(q.id);
+      }
+      localStorage.setItem(WRONG_POOL_KEY, JSON.stringify([...wrongQuestionIds]));
+      updateWrongBadge();
+
+      renderQuestion();
+    }
+
+    btnPrev.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    });
+
+    btnNext.addEventListener("click", () => {
+      if (currentIndex < currentQuiz.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      }
+    });
+
+    // Lưu kết quả làm đề vào lịch sử
+    function saveCurrentExamHistory(showAlert = true) {
+      const answeredKeys = Object.keys(userAnswers);
+      if (answeredKeys.length === 0) {
+        if (showAlert) alert("Bạn chưa làm câu nào để nộp!");
+        return;
+      }
+
+      let correct = 0;
+      answeredKeys.forEach(k => {
+        if (userAnswers[k].isCorrect) correct++;
+      });
+      const totalAnswered = answeredKeys.length;
+      const totalQuestions = currentQuiz.length;
+      const wrong = totalAnswered - correct;
+      const pct = Math.round((correct / totalQuestions) * 100);
+
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} - ${now.getDate()}/${now.getMonth() + 1}`;
+
+      const tags = [];
+      if (shuffleQuestionsToggle.checked) tags.push("Đảo câu");
+      if (shuffleOptionsToggle.checked) tags.push("Đảo đáp án");
+      const tagStr = tags.length > 0 ? ` [${tags.join(", ")}]` : "";
+
+      const attempt = {
+        time: timeStr,
+        name: currentExamName + tagStr,
+        totalQuestions: totalQuestions,
+        answered: totalAnswered,
+        correct: correct,
+        wrong: wrong,
+        percentage: pct
+      };
+
+      examHistory.unshift(attempt);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(examHistory));
+      renderHistoryTable();
+
+      if (showAlert) {
+        alert(`Đã nộp bài thành công!\nĐiểm: ${correct}/${totalQuestions} (${pct}%)\nCâu sai đã được lưu vào kho ôn luyện riêng.`);
+      }
+    }
+
+    btnFinishExam.addEventListener("click", () => {
+      saveCurrentExamHistory(true);
+    });
+
+    function renderHistoryTable() {
+      if (examHistory.length === 0) {
+        historyTbody.innerHTML = `<tr><td colspan="6" class="empty-history">Chưa có lịch sử làm đề nào được lưu.</td></tr>`;
+        return;
+      }
+
+      historyTbody.innerHTML = "";
+      examHistory.forEach((item, idx) => {
+        const tr = document.createElement("tr");
+        const scoreClass = item.percentage >= 70 ? "score-high" : (item.percentage < 50 ? "score-low" : "");
+        tr.innerHTML = `
+          <td>#${examHistory.length - idx}</td>
+          <td style="color: var(--text-muted); font-size: 11px;">${item.time}</td>
+          <td><strong>${item.name}</strong></td>
+          <td>${item.answered}/${item.totalQuestions}</td>
+          <td><span style="color:var(--neon-green)">${item.correct}</span> / <span style="color:var(--neon-red)">${item.wrong}</span></td>
+          <td class="${scoreClass}">${item.percentage}%</td>
+        `;
+        historyTbody.appendChild(tr);
+      });
+    }
+
+    btnClearHistory.addEventListener("click", () => {
+      if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử các lần làm đề?")) {
+        examHistory = [];
+        localStorage.removeItem(STORAGE_KEY);
+        renderHistoryTable();
+      }
+    });
+
+    // Lắng nghe bàn phím
+    window.addEventListener("keydown", (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        btnPrev.click();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        btnNext.click();
+      } else if (["1", "2", "3", "4"].includes(e.key)) {
+        e.preventDefault();
+        const optIdx = parseInt(e.key) - 1;
+        handleSelectOption(optIdx);
+      }
+    });
+
+    // Khởi chạy ban đầu
+    updateWrongBadge();
+    renderHistoryTable();
+    initQuiz([...questionBank], "Tất cả bài học (Full 268 câu)");
+  </script>
+</body>
+</html>
